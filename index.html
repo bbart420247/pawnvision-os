@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PawnVision OS | AI-powered pawn shop operating system</title>
+    <meta name="description" content="PawnVision OS is an AI-powered pawn shop operating system with smarter appraisals, digital intake, inventory workflows, and broker review tools." />
+    <meta name="application-name" content="PawnVision OS" />
+    <link rel="canonical" href="https://pawnvision-os.com/" />
+    <meta property="og:site_name" content="PawnVision OS" />
+    <meta property="og:title" content="PawnVision OS" />
+    <meta property="og:description" content="AI-powered pawn shop operating system with smarter appraisals, digital intake, inventory workflows, and broker review tools." />
+    <meta property="og:url" content="https://pawnvision-os.com/" />
+    <meta property="og:image" content="https://pawnvision-os.com/assets/branding/pawnvision-og.png" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="PawnVision OS" />
+    <meta name="twitter:description" content="AI-powered pawn shop operating system with smarter appraisals, digital intake, inventory workflows, and broker review tools." />
+    <meta name="twitter:url" content="https://pawnvision-os.com/" />
+    <meta name="twitter:image" content="https://pawnvision-os.com/assets/branding/pawnvision-og.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./assets/branding/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./assets/branding/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./assets/branding/favicon-16x16.png" />
+    <link rel="icon" href="./assets/branding/favicon.ico" />
+    <link rel="manifest" href="./assets/branding/site.webmanifest" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <a class="brand" href="#home" aria-label="PawnVision home">
+          <img class="brand-logo" src="./assets/branding/pawnvision-logo-v2.png" alt="PawnVision" />
+        </a>
+
+        <nav class="main-nav" aria-label="Primary">
+          <a href="#home">Home</a>
+          <a href="./how-it-works.html">How It Works</a>
+          <a href="./categories.html">Categories</a>
+          <a href="./guides.html">Guides</a>
+          <a href="./faq.html">FAQ</a>
+          <a href="./about.html">About Us</a>
+          <a href="./contact.html">Contact</a>
+        </nav>
+
+        <div class="topbar-actions">
+          <a class="outline-button" href="#dashboard">Dashboard</a>
+          <div class="user-pill">
+            <span class="avatar">A</span>
+            <span>
+              <small>Welcome back,</small>
+              <strong>Ace User</strong>
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="dashboard-frame" aria-label="PawnVision dashboard frame">
+          <section class="dashboard" id="dashboard" aria-label="PawnVision dashboard demo">
+            <div class="left-rail">
+              <aside class="panel workflow-panel" id="workflow">
+                <div class="panel-heading">
+                  <h2>1. Upload your item</h2>
+                  <span class="help-dot">?</span>
+                </div>
+
+                <div class="tab-row" role="tablist" aria-label="Capture modes">
+                  <button class="tab is-active" type="button">360 View</button>
+                  <button class="tab" type="button">Photos</button>
+                  <button class="tab" type="button">Video</button>
+                </div>
+
+                <label class="upload-card" for="file-input" id="drop-zone">
+                  <input id="file-input" class="visually-hidden" type="file" accept="image/*" multiple />
+                  <div class="upload-icon">3D</div>
+                  <p>Upload the full item photo set</p>
+                  <p>or</p>
+                  <span class="gold-button button-full fake-button">Start 360 Capture</span>
+                  <small>Supported: JPG, PNG, MP4, WEBM</small>
+                </label>
+
+                <div class="upload-status" aria-live="polite">
+                  <strong id="upload-count">0 of 8 recommended views added</strong>
+                  <span id="upload-hint">Front, back, left, right, serial, damage, optional 360, accessory photo.</span>
+                </div>
+
+                <div class="customer-checklist" id="customer-checklist" aria-label="Customer photo checklist"></div>
+
+                <div class="quality-review">
+                  <div class="section-label section-label-tight">
+                    <span>Image requirements</span>
+                    <span id="submission-status">Awaiting upload</span>
+                  </div>
+                  <ul class="quality-list" id="quality-list"></ul>
+                  <p class="quality-message" id="quality-message">
+                    Please add a clearer photo before submitting.
+                  </p>
+                </div>
+
+                <div class="section-label">
+                  <span>Recent captures</span>
+                  <a href="#categories">View all</a>
+                </div>
+
+                <div class="capture-strip" id="recent-captures" aria-label="Recent captures">
+                  <button class="capture-thumb placeholder-thumb is-selected" type="button">
+                    <span>1</span>
+                  </button>
+                  <button class="capture-thumb placeholder-thumb" type="button">
+                    <span>2</span>
+                  </button>
+                  <button class="capture-thumb placeholder-thumb" type="button">
+                    <span>3</span>
+                  </button>
+                  <button class="capture-thumb placeholder-thumb" type="button">
+                    <span>4</span>
+                  </button>
+                </div>
+
+                <ol class="step-list">
+                  <li class="is-complete"><span>2.</span> Item details</li>
+                  <li class="is-complete"><span>3.</span> Condition</li>
+                  <li class="is-complete"><span>4.</span> Your info</li>
+                  <li class="is-current"><span>5.</span> Review &amp; submit</li>
+                </ol>
+              </aside>
+
+              <aside class="panel support-card" id="contact">
+                <h3>Need help?</h3>
+                <p>Our team is here to assist you.</p>
+                <a class="outline-button button-full" href="#contact">Live Chat</a>
+              </aside>
+            </div>
+
+            <div class="center-rail">
+              <section class="panel viewer-panel">
+            <div class="panel-heading">
+              <h2>360° item viewer</h2>
+              <a class="outline-button viewer-fullscreen" id="open-image" href="./assets/branding/pawnvision-hero.png" target="_blank" rel="noreferrer">Full Screen</a>
+            </div>
+
+            <div class="viewer-note">
+              Use your mouse to rotate • Scroll to zoom • Hold right click to pan
+            </div>
+
+            <div class="image-intel" id="image-intel">
+              <strong id="active-shot-label">Awaiting uploaded angles</strong>
+              <p id="active-shot-note">AI notes will update here when the broker selects an uploaded image.</p>
+            </div>
+
+            <div class="viewer-stage">
+              <button class="viewer-arrow" id="prev-image" type="button" aria-label="Previous image">‹</button>
+              <div class="watch-display" id="viewer-surface">
+                <div class="viewer-placeholder" id="viewer-placeholder" aria-hidden="true"></div>
+                <img
+                  class="viewer-image is-hidden"
+                  id="viewer-image"
+                  src="./assets/branding/pawnvision-hero.png"
+                  alt="Selected item preview"
+                />
+              </div>
+              <button class="viewer-arrow" id="next-image" type="button" aria-label="Next image">›</button>
+            </div>
+
+            <div class="viewer-toolbar" aria-label="Viewer controls">
+              <button class="tool-chip is-active" id="rotate-tool" type="button">Rotate</button>
+              <button class="tool-chip" id="zoom-tool" type="button">Zoom</button>
+              <button class="tool-chip" id="reset-tool" type="button">Reset</button>
+              <button class="tool-chip" id="tilt-tool" type="button">Tilt</button>
+              <button class="tool-chip" id="light-tool" type="button">Light</button>
+            </div>
+
+            <div class="thumb-row" id="viewer-thumbs" aria-label="Item angles">
+              <button class="angle-thumb placeholder-thumb is-selected" type="button">
+                <span>A</span>
+              </button>
+              <button class="angle-thumb placeholder-thumb" type="button">
+                <span>B</span>
+              </button>
+              <button class="angle-thumb placeholder-thumb" type="button">
+                <span>C</span>
+              </button>
+              <button class="angle-thumb placeholder-thumb" type="button">
+                <span>D</span>
+              </button>
+              <button class="angle-thumb placeholder-thumb" type="button">
+                <span>E</span>
+              </button>
+            </div>
+
+              </section>
+
+              <section class="panel analysis-panel" id="categories">
+                <div class="analysis-grid">
+                  <article class="analysis-card">
+                    <h3>AI condition analysis</h3>
+                    <p class="status-good empty-value" id="condition-status">&nbsp;</p>
+                    <ul class="detail-list">
+                      <li><span>Identified item</span><strong id="detail-identified" class="empty-value">&nbsp;</strong></li>
+                      <li><span>Likely brand</span><strong id="detail-brand" class="empty-value">&nbsp;</strong></li>
+                      <li><span>Likely model</span><strong id="detail-model" class="empty-value">&nbsp;</strong></li>
+                      <li><span>Visible condition</span><strong id="detail-condition" class="empty-value">&nbsp;</strong></li>
+                      <li><span>Resale category</span><strong id="detail-category" class="empty-value">&nbsp;</strong></li>
+                      <li><span>Selected image</span><strong id="detail-angle" class="empty-value">&nbsp;</strong></li>
+                    </ul>
+                  </article>
+
+                  <article class="analysis-card">
+                    <h3>Potential issues</h3>
+                    <ul class="issue-list">
+                      <li>
+                        <span id="issue-primary" class="empty-value">&nbsp;</span>
+                        <a id="issue-primary-action" href="#workflow">&nbsp;</a>
+                      </li>
+                      <li>
+                        <span id="issue-secondary" class="empty-value">&nbsp;</span>
+                        <a id="issue-secondary-action" href="#workflow">&nbsp;</a>
+                      </li>
+                    </ul>
+                    <p class="analysis-note" id="market-research-note">&nbsp;</p>
+                  </article>
+
+                  <article class="analysis-card authenticity-card">
+                    <h3>Authenticity check</h3>
+                    <p class="auth-pill empty-value" id="auth-status">&nbsp;</p>
+                    <div class="confidence-row">
+                      <span>Confidence score</span>
+                      <strong id="auth-confidence" class="empty-value">&nbsp;</strong>
+                    </div>
+                    <div class="confidence-row">
+                      <span>Broker review</span>
+                      <strong id="broker-review-flag" class="empty-value">&nbsp;</strong>
+                    </div>
+                    <p class="analysis-note" id="auth-note">&nbsp;</p>
+                  </article>
+                </div>
+              </section>
+            </div>
+
+            <aside class="panel summary-panel" id="about">
+            <div class="panel-heading">
+              <h2>AI appraisal summary</h2>
+            </div>
+
+            <div class="value-card">
+              <span>Identified item</span>
+              <strong id="summary-item-name" class="empty-value">&nbsp;</strong>
+              <small id="summary-confidence">Confidence pending uploaded photos</small>
+            </div>
+
+            <div class="mini-stat-grid">
+              <div class="mini-stat">
+                <span>Condition estimate</span>
+                <strong id="summary-condition" class="empty-value">&nbsp;</strong>
+                <small>Visible from uploaded photos</small>
+              </div>
+              <div class="mini-stat">
+                <span>Market research</span>
+                <strong id="summary-market" class="empty-value">&nbsp;</strong>
+                <small>Broker review workflow</small>
+              </div>
+              <div class="mini-stat">
+                <span>Broker review</span>
+                <strong id="summary-review" class="empty-value">&nbsp;</strong>
+                <small>Final offer required</small>
+              </div>
+            </div>
+
+            <div class="summary-block">
+              <h3>Suggested internal ranges</h3>
+              <div class="summary-row">
+                <span>Likely pawn range</span>
+                <strong id="summary-pawn-range" class="empty-value">&nbsp;</strong>
+              </div>
+              <div class="summary-row">
+                <span>Likely buy range</span>
+                <strong id="summary-buy-range" class="empty-value">&nbsp;</strong>
+              </div>
+            </div>
+
+            <div class="summary-block">
+              <h3>AI workflow output</h3>
+              <div class="summary-row"><span>Visible issues</span><strong id="summary-visible-issues" class="empty-value">&nbsp;</strong></div>
+              <div class="summary-row"><span>Additional photos</span><strong id="summary-additional-photos" class="empty-value">&nbsp;</strong></div>
+              <div class="summary-row"><span>Resale category</span><strong id="summary-resale-category" class="empty-value">&nbsp;</strong></div>
+              <div class="summary-row"><span>Submission status</span><strong id="summary-submission-status" class="empty-value">&nbsp;</strong></div>
+              <div class="summary-row"><span>AI note source</span><strong id="summary-note-source" class="empty-value">&nbsp;</strong></div>
+              <div class="summary-row"><span>Manual verification</span><strong id="summary-manual-check" class="empty-value">&nbsp;</strong></div>
+            </div>
+
+            <div class="summary-block">
+              <h3>Item details</h3>
+              <div class="meta-grid">
+                <span>Brand / model</span><strong id="meta-brand-model" class="empty-value">&nbsp;</strong>
+                <span>Serial / model photo</span><strong id="meta-serial" class="empty-value">&nbsp;</strong>
+                <span>Accessories</span><strong id="meta-accessories" class="empty-value">&nbsp;</strong>
+                <span>Condition (AI)</span><strong id="meta-condition" class="empty-value">&nbsp;</strong>
+                <span>Inventory controls</span><strong id="meta-inventory" class="empty-value">&nbsp;</strong>
+              </div>
+            </div>
+
+            <div class="summary-block">
+              <h3>Broker controls</h3>
+              <div class="broker-controls">
+                <button class="outline-button" type="button">Assign Tag</button>
+                <button class="outline-button" type="button">Print Label</button>
+                <button class="outline-button" type="button">Ticket Print</button>
+              </div>
+            </div>
+
+            <p class="disclaimer">
+              AI outputs are likely findings based on uploaded photos. Final offer and authenticity
+              decisions require broker review and in-person inspection.
+            </p>
+            <a class="gold-button button-full" href="#contact">Submit For In-Store Review</a>
+            </aside>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      const state = {
+        images: [],
+        activeIndex: 0,
+        rotation: 0,
+        zoomed: false,
+        tilted: false,
+        lit: false,
+      };
+
+      const slotBlueprint = [
+        {
+          key: "front",
+          label: "Front photo",
+          required: true,
+          keywords: ["front", "face", "dial"],
+          note: "Front image loaded. Likely primary face visible. Check glare and surface wear before final decision.",
+          issue: "Minor glare may hide surface detail.",
+          action: "Review main face under better light",
+        },
+        {
+          key: "back",
+          label: "Back photo",
+          required: true,
+          keywords: ["back", "rear", "caseback"],
+          note: "Back image loaded. Rear housing and closure details visible from uploaded photo.",
+          issue: "Back side should be reviewed for wear and service marks.",
+          action: "Confirm rear housing condition",
+        },
+        {
+          key: "left",
+          label: "Left side",
+          required: true,
+          keywords: ["left", "side-left"],
+          note: "Left side image loaded. Side edge can help show case wear or tool damage.",
+          issue: "Possible side wear needs closer review.",
+          action: "Request tighter side close-up if needed",
+        },
+        {
+          key: "right",
+          label: "Right side",
+          required: true,
+          keywords: ["right", "side-right"],
+          note: "Right side image loaded. Buttons, crown, controls, ports, or edge detail should be checked manually.",
+          issue: "Control-side wear may affect value.",
+          action: "Verify moving parts manually",
+        },
+        {
+          key: "serial",
+          label: "Brand / serial close-up",
+          required: true,
+          keywords: ["serial", "model", "brand", "ref"],
+          note: "Serial or model area is visible. Broker should verify the identifier manually before approval.",
+          issue: "Serial visibility affects confidence level.",
+          action: "Manual serial verification required",
+        },
+        {
+          key: "damage",
+          label: "Damage close-up",
+          required: false,
+          keywords: ["damage", "scratch", "wear", "dent"],
+          note: "Damage close-up loaded. Visible wear can now be compared against customer description.",
+          issue: "Visible damage should be confirmed in person.",
+          action: "Compare condition against final inspection",
+        },
+        {
+          key: "capture360",
+          label: "360° capture or video",
+          required: false,
+          keywords: ["360", "video", "spin", "rotate"],
+          note: "Multi-angle capture loaded. Rotating views improve documentation and help with condition review.",
+          issue: "Motion capture is supportive but not final proof.",
+          action: "Use capture for broker walkthrough",
+        },
+        {
+          key: "accessories",
+          label: "Receipt / box / accessories",
+          required: false,
+          keywords: ["box", "receipt", "charger", "accessory", "papers"],
+          note: "Accessory photo loaded. Packaging and extras may support value and authenticity review.",
+          issue: "Missing accessories may reduce offer strength.",
+          action: "Confirm accessory completeness",
+        },
+      ];
+
+      const categoryRules = [
+        { category: "Luxury watch", brand: "Rolex", model: "Luxury watch", keywords: ["rolex"] },
+        { category: "Luxury watch", brand: "Omega", model: "Luxury watch", keywords: ["omega"] },
+        { category: "Luxury watch", brand: "Tag Heuer", model: "Luxury watch", keywords: ["tag", "heuer"] },
+        { category: "Jewelry", brand: "Likely jewelry", model: "Gold / silver item", keywords: ["ring", "chain", "gold", "jewelry", "bracelet", "necklace"] },
+        { category: "Electronics", brand: "Apple", model: "Consumer electronic", keywords: ["iphone", "ipad", "macbook", "apple"] },
+        { category: "Electronics", brand: "Likely electronics", model: "Consumer device", keywords: ["laptop", "tablet", "camera", "drone", "phone"] },
+        { category: "Gaming", brand: "Likely gaming", model: "Game system", keywords: ["ps5", "xbox", "switch", "gaming"] },
+        { category: "Tools", brand: "Likely tools", model: "Professional tool", keywords: ["tool", "dewalt", "milwaukee", "makita", "snapon", "bosch"] },
+        { category: "Firearms", brand: "Requires broker review", model: "Firearm", keywords: ["glock", "firearm", "pistol", "rifle"] },
+        { category: "Collectibles", brand: "Likely collectible", model: "Collectible item", keywords: ["pokemon", "coin", "card", "comic", "collectible"] },
+      ];
+
+      const fileInput = document.getElementById("file-input");
+      const dropZone = document.getElementById("drop-zone");
+      const viewerImage = document.getElementById("viewer-image");
+      const viewerPlaceholder = document.getElementById("viewer-placeholder");
+      const viewerSurface = document.getElementById("viewer-surface");
+      const recentCaptures = document.getElementById("recent-captures");
+      const viewerThumbs = document.getElementById("viewer-thumbs");
+      const uploadCount = document.getElementById("upload-count");
+      const uploadHint = document.getElementById("upload-hint");
+      const openImage = document.getElementById("open-image");
+      const customerChecklist = document.getElementById("customer-checklist");
+      const qualityList = document.getElementById("quality-list");
+      const qualityMessage = document.getElementById("quality-message");
+
+      function inferRole(fileName, index, usedRoles) {
+        const name = fileName.toLowerCase();
+        const keywordMatch = slotBlueprint.find(
+          (slot) => !usedRoles.has(slot.key) && slot.keywords.some((keyword) => name.includes(keyword))
+        );
+
+        if (keywordMatch) {
+          usedRoles.add(keywordMatch.key);
+          return keywordMatch;
+        }
+
+        const sequentialMatch = slotBlueprint.find((slot, slotIndex) => slotIndex === index && !usedRoles.has(slot.key));
+        if (sequentialMatch) {
+          usedRoles.add(sequentialMatch.key);
+          return sequentialMatch;
+        }
+
+        const fallback = slotBlueprint.find((slot) => !usedRoles.has(slot.key)) || slotBlueprint[index % slotBlueprint.length];
+        usedRoles.add(fallback.key);
+        return fallback;
+      }
+
+      function loadImageMetrics(file, url) {
+        return new Promise((resolve) => {
+          const probe = new Image();
+          probe.onload = () => {
+            resolve({ width: probe.naturalWidth, height: probe.naturalHeight });
+          };
+          probe.onerror = () => resolve({ width: 0, height: 0 });
+          probe.src = url;
+        });
+      }
+
+      function inferCategory(images) {
+        const combined = images.map((item) => item.name.toLowerCase()).join(" ");
+        const match = categoryRules.find((rule) => rule.keywords.some((keyword) => combined.includes(keyword)));
+        if (match) {
+          return match;
+        }
+        return {
+          category: "General merchandise",
+          brand: "Likely item submitted",
+          model: "Needs broker review",
+        };
+      }
+
+      function getChecklistMap() {
+        return new Map(state.images.map((item) => [item.role, item]));
+      }
+
+      function getQualityChecks() {
+        const checklistMap = getChecklistMap();
+        const clearPhotos = state.images.length >= 4 && state.images.every((item) => item.width >= 700 && item.height >= 700);
+        const itemVisible = state.images.length >= 2;
+        const lightingAcceptable = state.images.length >= 3 && state.images.filter((item) => item.size > 60000).length >= Math.min(3, state.images.length);
+        const multipleAngles = ["front", "back", "left", "right"].every((role) => checklistMap.has(role));
+        const serialIncluded = checklistMap.has("serial");
+        const damageIncluded = checklistMap.has("damage");
+
+        return [
+          { label: "Image is clear", passed: clearPhotos },
+          { label: "Item is visible", passed: itemVisible },
+          { label: "Lighting is acceptable", passed: lightingAcceptable },
+          { label: "Multiple angles included", passed: multipleAngles },
+          { label: "Serial / model photo included", passed: serialIncluded },
+          { label: "Damage photos included if item is used", passed: damageIncluded, optional: true },
+        ];
+      }
+
+      function updateCustomerChecklist() {
+        const checklistMap = getChecklistMap();
+        customerChecklist.innerHTML = slotBlueprint
+          .map((slot) => {
+            const complete = checklistMap.has(slot.key);
+            return `
+              <div class="checklist-item${complete ? " is-complete" : ""}">
+                <span class="checklist-dot">${complete ? "✓" : slot.required ? "!" : "+"}</span>
+                <div>
+                  <strong>${slot.label}</strong>
+                  <small>${complete ? "Uploaded" : slot.required ? "Required before submission" : "Optional support image"}</small>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function updateQualityReview() {
+        const checks = getQualityChecks();
+        const failedRequired = checks.filter((check) => !check.passed && !check.optional);
+        const passedCount = checks.filter((check) => check.passed).length;
+
+        qualityList.innerHTML = checks
+          .map(
+            (check) => `
+              <li class="quality-item ${check.passed ? "is-pass" : "is-warn"}">
+                <span>${check.label}</span>
+                <strong>${check.passed ? "Ready" : check.optional ? "Recommended" : "Needed"}</strong>
+              </li>
+            `
+          )
+          .join("");
+
+        document.getElementById("submission-status").textContent = failedRequired.length
+          ? "Needs more photos"
+          : state.images.length
+            ? "Ready for AI review"
+            : "Awaiting upload";
+
+        qualityMessage.textContent = failedRequired.length
+          ? "Please add a clearer photo before submitting."
+          : state.images.length
+            ? "Uploaded images are strong enough for AI-assisted review. Final offer still requires in-person inspection."
+            : "Customer should upload multiple clear angles before the AI review starts.";
+
+        uploadCount.textContent = `${state.images.length} of 8 recommended views added`;
+        uploadHint.textContent = `${passedCount} of ${checks.length} image checks are currently satisfied.`;
+      }
+
+      function getActiveImageAnalysis() {
+        const active = state.images[state.activeIndex];
+        if (!active) {
+          return null;
+        }
+
+        const inferred = inferCategory(state.images);
+        const checklistMap = getChecklistMap();
+        const condition = checklistMap.has("damage")
+          ? "Used item with visible wear noted"
+          : state.images.length >= 5
+            ? "Likely good condition from uploaded photos"
+            : "Limited visual evidence so far";
+        const confidenceValue = Math.min(
+          94,
+          44 +
+            state.images.length * 6 +
+            (checklistMap.has("serial") ? 10 : 0) +
+            (checklistMap.has("damage") ? 5 : 0) +
+            (checklistMap.has("capture360") ? 4 : 0)
+        );
+        const visibleIssues = checklistMap.has("damage")
+          ? "Possible scratches or wear visible from uploaded close-ups"
+          : "No major damage visible in selected images"
+        const additionalPhotos = slotBlueprint
+          .filter((slot) => slot.required && !checklistMap.has(slot.key))
+          .map((slot) => slot.label);
+
+        return {
+          active,
+          inferred,
+          condition,
+          confidenceText: `${confidenceValue}% likely match`,
+          visibleIssues,
+          additionalPhotos,
+          marketResearch: inferred.category === "Luxury watch" || inferred.category === "Collectibles"
+            ? "Broker should compare specialty market comps"
+            : "Broker should review local resale demand",
+          suggestedPawn: state.images.length >= 5 ? "Pending market comp review" : "Needs fuller photo set",
+          suggestedBuy: state.images.length >= 5 ? "Likely after broker inspection" : "Awaiting additional evidence",
+          authenticity: checklistMap.has("serial")
+            ? "Likely authentic from uploaded photos. Needs broker review."
+            : "Possible match only. Serial image needed.",
+          noteSource: active.slot.label,
+          serialStatus: checklistMap.has("serial") ? "Visible for manual verification" : "Serial / model photo needed",
+          accessories: checklistMap.has("accessories") ? "Supporting accessories uploaded" : "No accessory photo uploaded",
+          inventoryControls: "Assign tag after final inspection",
+          reviewFlag: "Needs broker review",
+          submissionStatus: additionalPhotos.length ? "Waiting on required photos" : "Ready for broker intake",
+          activeNote: active.slot.note,
+          activeIssue: active.slot.issue,
+          activeAction: active.slot.action,
+        };
+      }
+
+      function updateBrokerPanels() {
+        const analysis = getActiveImageAnalysis();
+
+        if (!analysis) {
+          document.getElementById("active-shot-label").textContent = "Awaiting uploaded angles";
+          document.getElementById("active-shot-note").textContent = "AI notes will update here when the broker selects an uploaded image.";
+          return;
+        }
+
+        document.getElementById("active-shot-label").textContent = analysis.noteSource;
+        document.getElementById("active-shot-note").textContent = analysis.activeNote;
+        document.getElementById("condition-status").textContent = analysis.condition;
+        document.getElementById("detail-identified").textContent = analysis.inferred.category;
+        document.getElementById("detail-brand").textContent = analysis.inferred.brand;
+        document.getElementById("detail-model").textContent = analysis.inferred.model;
+        document.getElementById("detail-condition").textContent = analysis.condition;
+        document.getElementById("detail-category").textContent = analysis.inferred.category;
+        document.getElementById("detail-angle").textContent = analysis.noteSource;
+        document.getElementById("issue-primary").textContent = analysis.activeIssue;
+        document.getElementById("issue-primary-action").textContent = "Needs broker review";
+        document.getElementById("issue-secondary").textContent = analysis.additionalPhotos.length
+          ? `Additional photo recommended: ${analysis.additionalPhotos[0]}`
+          : "No extra photo request from current image set";
+        document.getElementById("issue-secondary-action").textContent = analysis.additionalPhotos.length
+          ? "Request upload"
+          : "Continue review";
+        document.getElementById("market-research-note").textContent = analysis.marketResearch;
+        document.getElementById("auth-status").textContent = analysis.authenticity;
+        document.getElementById("auth-confidence").textContent = analysis.confidenceText;
+        document.getElementById("broker-review-flag").textContent = analysis.reviewFlag;
+        document.getElementById("auth-note").textContent = "Final authenticity and offer decisions require manual inspection.";
+
+        document.getElementById("summary-item-name").textContent = `${analysis.inferred.brand} / ${analysis.inferred.model}`;
+        document.getElementById("summary-confidence").textContent = analysis.confidenceText;
+        document.getElementById("summary-condition").textContent = analysis.condition;
+        document.getElementById("summary-market").textContent = analysis.marketResearch;
+        document.getElementById("summary-review").textContent = analysis.reviewFlag;
+        document.getElementById("summary-pawn-range").textContent = analysis.suggestedPawn;
+        document.getElementById("summary-buy-range").textContent = analysis.suggestedBuy;
+        document.getElementById("summary-visible-issues").textContent = analysis.visibleIssues;
+        document.getElementById("summary-additional-photos").textContent = analysis.additionalPhotos.length
+          ? analysis.additionalPhotos.join(", ")
+          : "No additional photo request";
+        document.getElementById("summary-resale-category").textContent = analysis.inferred.category;
+        document.getElementById("summary-submission-status").textContent = analysis.submissionStatus;
+        document.getElementById("summary-note-source").textContent = analysis.noteSource;
+        document.getElementById("summary-manual-check").textContent = "Required before final offer";
+        document.getElementById("meta-brand-model").textContent = `${analysis.inferred.brand} / ${analysis.inferred.model}`;
+        document.getElementById("meta-serial").textContent = analysis.serialStatus;
+        document.getElementById("meta-accessories").textContent = analysis.accessories;
+        document.getElementById("meta-condition").textContent = analysis.condition;
+        document.getElementById("meta-inventory").textContent = analysis.inventoryControls;
+      }
+
+      function resetTransforms() {
+        state.rotation = 0;
+        state.zoomed = false;
+        state.tilted = false;
+        state.lit = false;
+        updateViewerTransform();
+      }
+
+      function updateViewerTransform() {
+        viewerImage.style.setProperty("--image-rotation", state.rotation + "deg");
+        viewerImage.style.setProperty("--image-scale", state.zoomed ? "1.22" : "1");
+        viewerImage.style.setProperty("--image-tilt", state.tilted ? "-6deg" : "0deg");
+        viewerImage.style.setProperty("--image-light", state.lit ? "1.12" : "1");
+      }
+
+      function renderButtonImage(item, index, className) {
+        return `
+          <button class="${className}${index === state.activeIndex ? " is-selected" : ""}" type="button" data-index="${index}">
+            <img src="${item.url}" alt="${item.name}" />
+          </button>
+        `;
+      }
+
+      function updateSelectedImage() {
+        const active = state.images[state.activeIndex];
+
+        if (!active) {
+          viewerImage.classList.add("is-hidden");
+          viewerPlaceholder.classList.remove("is-hidden");
+          openImage.setAttribute("href", "./assets/branding/pawnvision-hero.png");
+          document.getElementById("active-shot-label").textContent = "Awaiting uploaded angles";
+          document.getElementById("active-shot-note").textContent = "AI notes will update here when the broker selects an uploaded image.";
+          return;
+        }
+
+        viewerImage.src = active.url;
+        viewerImage.alt = active.name;
+        viewerImage.classList.remove("is-hidden");
+        viewerPlaceholder.classList.add("is-hidden");
+        openImage.setAttribute("href", active.url);
+      }
+
+      function bindThumbClicks() {
+        document.querySelectorAll("[data-index]").forEach((button) => {
+          button.addEventListener("click", () => {
+            state.activeIndex = Number(button.dataset.index);
+            renderUploads();
+          });
+        });
+      }
+
+      function renderUploads() {
+        if (!state.images.length) {
+          recentCaptures.innerHTML = `
+            <button class="capture-thumb placeholder-thumb is-selected" type="button"><span>1</span></button>
+            <button class="capture-thumb placeholder-thumb" type="button"><span>2</span></button>
+            <button class="capture-thumb placeholder-thumb" type="button"><span>3</span></button>
+            <button class="capture-thumb placeholder-thumb" type="button"><span>4</span></button>
+          `;
+          viewerThumbs.innerHTML = `
+            <button class="angle-thumb placeholder-thumb is-selected" type="button"><span>A</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button"><span>B</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button"><span>C</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button"><span>D</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button"><span>E</span></button>
+          `;
+          updateCustomerChecklist();
+          updateQualityReview();
+          updateSelectedImage();
+          updateBrokerPanels();
+          updateViewerTransform();
+          return;
+        }
+
+        recentCaptures.innerHTML = state.images
+          .slice(0, 4)
+          .map((item, index) => renderButtonImage(item, index, "capture-thumb"))
+          .join("");
+
+        viewerThumbs.innerHTML = state.images
+          .slice(0, 5)
+          .map((item, index) => renderButtonImage(item, index, "angle-thumb"))
+          .join("");
+
+        bindThumbClicks();
+        updateCustomerChecklist();
+        updateQualityReview();
+        updateSelectedImage();
+        updateBrokerPanels();
+        updateViewerTransform();
+      }
+
+      async function loadFiles(fileList) {
+        const imageFiles = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
+        if (!imageFiles.length) {
+          return;
+        }
+
+        state.images.forEach((item) => URL.revokeObjectURL(item.url));
+        const usedRoles = new Set();
+        state.images = await Promise.all(
+          imageFiles.map(async (file, index) => {
+            const url = URL.createObjectURL(file);
+            const metrics = await loadImageMetrics(file, url);
+            const slot = inferRole(file.name, index, usedRoles);
+            return {
+              name: file.name,
+              url,
+              size: file.size,
+              width: metrics.width,
+              height: metrics.height,
+              slot,
+              role: slot.key,
+            };
+          })
+        );
+        state.activeIndex = 0;
+        resetTransforms();
+        renderUploads();
+      }
+
+      fileInput.addEventListener("change", (event) => {
+        loadFiles(event.target.files);
+      });
+
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.add("is-dragging");
+        });
+      });
+
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+          event.preventDefault();
+          dropZone.classList.remove("is-dragging");
+        });
+      });
+
+      dropZone.addEventListener("drop", (event) => {
+        loadFiles(event.dataTransfer.files);
+      });
+
+      document.getElementById("prev-image").addEventListener("click", () => {
+        if (!state.images.length) {
+          return;
+        }
+        state.activeIndex = (state.activeIndex - 1 + state.images.length) % state.images.length;
+        renderUploads();
+      });
+
+      document.getElementById("next-image").addEventListener("click", () => {
+        if (!state.images.length) {
+          return;
+        }
+        state.activeIndex = (state.activeIndex + 1) % state.images.length;
+        renderUploads();
+      });
+
+      document.getElementById("rotate-tool").addEventListener("click", () => {
+        state.rotation = (state.rotation + 90) % 360;
+        updateViewerTransform();
+      });
+
+      document.getElementById("zoom-tool").addEventListener("click", () => {
+        state.zoomed = !state.zoomed;
+        updateViewerTransform();
+      });
+
+      document.getElementById("reset-tool").addEventListener("click", () => {
+        resetTransforms();
+      });
+
+      document.getElementById("tilt-tool").addEventListener("click", () => {
+        state.tilted = !state.tilted;
+        updateViewerTransform();
+      });
+
+      document.getElementById("light-tool").addEventListener("click", () => {
+        state.lit = !state.lit;
+        updateViewerTransform();
+      });
+
+      renderUploads();
+    </script>
+  </body>
+</html>

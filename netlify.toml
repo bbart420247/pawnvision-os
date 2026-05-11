@@ -1,0 +1,18 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "http://pawnvision-os.com/*"
+  to = "https://pawnvision-os.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.pawnvision-os.com/*"
+  to = "https://pawnvision-os.com/:splat"
+  status = 301
+  force = true
+
+[build.environment]
+  NODE_VERSION = "20"
+
