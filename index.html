@@ -149,7 +149,7 @@
               <section class="panel viewer-panel">
             <div class="panel-heading">
               <h2>360° item viewer</h2>
-              <a class="outline-button viewer-fullscreen" id="open-image" href="./assets/branding/pawnvision-hero.png" target="_blank" rel="noreferrer">Full Screen</a>
+              <button class="outline-button viewer-fullscreen" id="open-image" type="button">Full Screen</button>
             </div>
 
             <div class="viewer-note">
@@ -378,6 +378,27 @@
       </div>
     </div>
 
+    <div class="inspector-modal is-hidden" id="inspector-modal" aria-hidden="true">
+      <div class="inspector-backdrop" id="close-inspector"></div>
+      <div class="inspector-shell" role="dialog" aria-modal="true" aria-labelledby="inspector-title">
+        <div class="inspector-header">
+          <div>
+            <strong id="inspector-title">Image Inspection View</strong>
+            <p id="inspector-meta">Full image inspection mode</p>
+          </div>
+          <button class="outline-button" id="close-inspector-button" type="button">Close</button>
+        </div>
+        <div class="inspector-stage">
+          <button class="viewer-arrow inspector-arrow" id="inspector-prev" type="button" aria-label="Previous image">‹</button>
+          <div class="inspector-frame" id="inspector-frame">
+            <img class="inspector-image is-hidden" id="inspector-image" alt="Fullscreen item preview" />
+            <video class="inspector-video is-hidden" id="inspector-video" controls muted loop playsinline></video>
+          </div>
+          <button class="viewer-arrow inspector-arrow" id="inspector-next" type="button" aria-label="Next image">›</button>
+        </div>
+      </div>
+    </div>
+
     <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
 
     <script>
@@ -392,6 +413,12 @@
         zoomed: false,
         tilted: false,
         lit: false,
+        panX: 0,
+        panY: 0,
+        dragging: false,
+        dragTarget: null,
+        dragStartX: 0,
+        dragStartY: 0,
 	        auth: {
 	          loggedIn: false,
 	          role: "",
@@ -581,6 +608,11 @@
       const viewerVideo = document.getElementById("viewer-video");
       const viewerPlaceholder = document.getElementById("viewer-placeholder");
       const viewerSurface = document.getElementById("viewer-surface");
+      const inspectorModal = document.getElementById("inspector-modal");
+      const inspectorFrame = document.getElementById("inspector-frame");
+      const inspectorImage = document.getElementById("inspector-image");
+      const inspectorVideo = document.getElementById("inspector-video");
+      const inspectorMeta = document.getElementById("inspector-meta");
       const recentCaptures = document.getElementById("recent-captures");
       const viewerThumbs = document.getElementById("viewer-thumbs");
       const uploadCount = document.getElementById("upload-count");
@@ -1214,18 +1246,80 @@
         state.zoomed = false;
         state.tilted = false;
         state.lit = false;
+        state.panX = 0;
+        state.panY = 0;
         updateViewerTransform();
       }
 
+      function getActiveMediaItem() {
+        return state.images[state.activeIndex] || null;
+      }
+
+      function getFitCompensation(item, frame) {
+        if (!item || !frame) {
+          return 1;
+        }
+
+        const mediaWidth = item.width || 1;
+        const mediaHeight = item.height || 1;
+        const frameWidth = frame.clientWidth || 1;
+        const frameHeight = frame.clientHeight || 1;
+        const mediaRatio = mediaWidth / mediaHeight;
+        const frameRatio = frameWidth / frameHeight;
+
+        let displayedWidth = 0;
+        let displayedHeight = 0;
+
+        if (mediaRatio > frameRatio) {
+          displayedWidth = frameWidth;
+          displayedHeight = frameWidth / mediaRatio;
+        } else {
+          displayedHeight = frameHeight;
+          displayedWidth = frameHeight * mediaRatio;
+        }
+
+        if (state.rotation % 180 === 0) {
+          return 1;
+        }
+
+        const rotatedWidth = displayedHeight;
+        const rotatedHeight = displayedWidth;
+        return Math.min(frameWidth / rotatedWidth, frameHeight / rotatedHeight, 1);
+      }
+
       function updateViewerTransform() {
-        viewerImage.style.setProperty("--image-rotation", state.rotation + "deg");
-        viewerImage.style.setProperty("--image-scale", state.zoomed ? "1.22" : "1");
+        const active = getActiveMediaItem();
+        const compensation = getFitCompensation(active, viewerSurface);
+        const baseScale = state.zoomed ? 1.22 : 1;
+        const inspectionScale = state.zoomed ? 1.08 : 1;
+
+        viewerImage.style.setProperty("--image-pan-x", `${state.panX}px`);
+        viewerImage.style.setProperty("--image-pan-y", `${state.panY}px`);
+        viewerImage.style.setProperty("--image-rotation", `${state.rotation}deg`);
+        viewerImage.style.setProperty("--image-scale", `${baseScale * compensation}`);
         viewerImage.style.setProperty("--image-tilt", state.tilted ? "-6deg" : "0deg");
         viewerImage.style.setProperty("--image-light", state.lit ? "1.12" : "1");
-        viewerVideo.style.setProperty("--image-rotation", state.rotation + "deg");
-        viewerVideo.style.setProperty("--image-scale", state.zoomed ? "1.08" : "1");
+
+        viewerVideo.style.setProperty("--image-pan-x", `${state.panX}px`);
+        viewerVideo.style.setProperty("--image-pan-y", `${state.panY}px`);
+        viewerVideo.style.setProperty("--image-rotation", `${state.rotation}deg`);
+        viewerVideo.style.setProperty("--image-scale", `${inspectionScale * compensation}`);
         viewerVideo.style.setProperty("--image-tilt", state.tilted ? "-4deg" : "0deg");
         viewerVideo.style.setProperty("--image-light", state.lit ? "1.08" : "1");
+
+        inspectorImage.style.setProperty("--image-pan-x", `${state.panX}px`);
+        inspectorImage.style.setProperty("--image-pan-y", `${state.panY}px`);
+        inspectorImage.style.setProperty("--image-rotation", `${state.rotation}deg`);
+        inspectorImage.style.setProperty("--image-scale", `${(state.zoomed ? 1.6 : 1) * getFitCompensation(active, inspectorFrame)}`);
+        inspectorImage.style.setProperty("--image-tilt", "0deg");
+        inspectorImage.style.setProperty("--image-light", state.lit ? "1.12" : "1");
+
+        inspectorVideo.style.setProperty("--image-pan-x", `${state.panX}px`);
+        inspectorVideo.style.setProperty("--image-pan-y", `${state.panY}px`);
+        inspectorVideo.style.setProperty("--image-rotation", `${state.rotation}deg`);
+        inspectorVideo.style.setProperty("--image-scale", `${(state.zoomed ? 1.35 : 1) * getFitCompensation(active, inspectorFrame)}`);
+        inspectorVideo.style.setProperty("--image-tilt", "0deg");
+        inspectorVideo.style.setProperty("--image-light", state.lit ? "1.08" : "1");
       }
 
       function renderButtonImage(item, index, className) {
@@ -1252,9 +1346,12 @@
           viewerVideo.classList.add("is-hidden");
           viewerVideo.pause();
           viewerPlaceholder.classList.remove("is-hidden");
-          openImage.setAttribute("href", "./assets/branding/pawnvision-hero.png");
           document.getElementById("active-shot-label").textContent = "Awaiting uploaded angles";
           document.getElementById("active-shot-note").textContent = "Guided intake notes will update here when the broker selects an uploaded image.";
+          inspectorImage.classList.add("is-hidden");
+          inspectorVideo.classList.add("is-hidden");
+          inspectorVideo.pause();
+          inspectorMeta.textContent = "Full image inspection mode";
           return;
         }
 
@@ -1263,15 +1360,65 @@
           viewerVideo.src = active.url;
           viewerVideo.classList.remove("is-hidden");
           viewerVideo.play().catch(() => {});
+          inspectorImage.classList.add("is-hidden");
+          inspectorVideo.src = active.url;
+          inspectorVideo.classList.remove("is-hidden");
         } else {
           viewerVideo.classList.add("is-hidden");
           viewerVideo.pause();
           viewerImage.src = active.url;
           viewerImage.alt = active.name;
           viewerImage.classList.remove("is-hidden");
+          inspectorVideo.classList.add("is-hidden");
+          inspectorVideo.pause();
+          inspectorImage.src = active.url;
+          inspectorImage.alt = active.name;
+          inspectorImage.classList.remove("is-hidden");
         }
         viewerPlaceholder.classList.add("is-hidden");
-        openImage.setAttribute("href", active.url);
+        inspectorMeta.textContent = `${active.slot.label} • Full image visible by default`;
+        updateViewerTransform();
+      }
+
+      function openInspector() {
+        if (!getActiveMediaItem()) {
+          showToast("Upload an image first to open inspection mode.");
+          return;
+        }
+        inspectorModal.classList.remove("is-hidden");
+        inspectorModal.setAttribute("aria-hidden", "false");
+        updateViewerTransform();
+      }
+
+      function closeInspector() {
+        inspectorModal.classList.add("is-hidden");
+        inspectorModal.setAttribute("aria-hidden", "true");
+        state.dragging = false;
+        state.dragTarget = null;
+      }
+
+      function beginPan(event, target) {
+        if (!state.zoomed) {
+          return;
+        }
+        state.dragging = true;
+        state.dragTarget = target;
+        state.dragStartX = event.clientX - state.panX;
+        state.dragStartY = event.clientY - state.panY;
+      }
+
+      function continuePan(event) {
+        if (!state.dragging) {
+          return;
+        }
+        state.panX = event.clientX - state.dragStartX;
+        state.panY = event.clientY - state.dragStartY;
+        updateViewerTransform();
+      }
+
+      function endPan() {
+        state.dragging = false;
+        state.dragTarget = null;
       }
 
       function bindThumbClicks() {
@@ -1459,8 +1606,12 @@
           return;
         }
         state.zoomed = !state.zoomed;
+        if (!state.zoomed) {
+          state.panX = 0;
+          state.panY = 0;
+        }
         updateViewerTransform();
-        showToast(state.zoomed ? "Zoom enabled." : "Zoom reset.");
+        showToast(state.zoomed ? "Zoom enabled. Drag to inspect fine details." : "Zoom reset.");
       });
 
       document.getElementById("reset-tool").addEventListener("click", () => {
@@ -1503,11 +1654,25 @@
       });
       clearAllButton.addEventListener("click", clearAllUploads);
       resetDemoButton.addEventListener("click", resetDemoState);
+      openImage.addEventListener("click", openInspector);
+      document.getElementById("close-inspector-button").addEventListener("click", closeInspector);
+      document.getElementById("close-inspector").addEventListener("click", closeInspector);
+      document.getElementById("inspector-prev").addEventListener("click", () => document.getElementById("prev-image").click());
+      document.getElementById("inspector-next").addEventListener("click", () => document.getElementById("next-image").click());
+
+      viewerSurface.addEventListener("pointerdown", (event) => beginPan(event, "viewer"));
+      inspectorFrame.addEventListener("pointerdown", (event) => beginPan(event, "inspector"));
+      window.addEventListener("pointermove", continuePan);
+      window.addEventListener("pointerup", endPan);
+      window.addEventListener("pointercancel", endPan);
 
       document.getElementById("close-modal").addEventListener("click", closeModal);
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && !appModal.classList.contains("is-hidden")) {
           closeModal();
+        }
+        if (event.key === "Escape" && !inspectorModal.classList.contains("is-hidden")) {
+          closeInspector();
         }
       });
       appModal.addEventListener("click", (event) => {
