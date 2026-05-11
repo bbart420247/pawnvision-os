@@ -43,13 +43,24 @@
         </nav>
 
         <div class="topbar-actions">
-          <a class="outline-button" href="#dashboard">Dashboard</a>
-          <div class="user-pill">
-            <span class="avatar">A</span>
-            <span>
-              <small>Welcome back,</small>
-              <strong>Ace User</strong>
-            </span>
+          <a class="outline-button dashboard-link" href="#dashboard">Dashboard</a>
+          <div class="account-cluster">
+            <button class="outline-button" id="login-button" type="button">Login</button>
+            <button class="gold-button" id="create-account-button" type="button">Create Account</button>
+            <div class="user-menu is-hidden" id="user-menu">
+              <button class="user-pill user-pill-button" id="user-toggle" type="button" aria-expanded="false">
+                <span class="avatar" id="user-avatar">A</span>
+                <span>
+                  <small id="user-context">Signed in as</small>
+                  <strong id="user-name">Ace User</strong>
+                </span>
+              </button>
+              <div class="account-dropdown is-hidden" id="account-dropdown">
+                <button class="account-option" data-auth="customer" type="button">Customer Login</button>
+                <button class="account-option" data-auth="broker" type="button">Broker Login</button>
+                <button class="account-option" data-auth="logout" type="button">Log Out</button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -65,18 +76,18 @@
                 </div>
 
                 <div class="tab-row" role="tablist" aria-label="Capture modes">
-                  <button class="tab is-active" type="button">360 View</button>
-                  <button class="tab" type="button">Photos</button>
-                  <button class="tab" type="button">Video</button>
+                  <button class="tab is-active" data-mode="capture360" type="button">360 View</button>
+                  <button class="tab" data-mode="photos" type="button">Photos</button>
+                  <button class="tab" data-mode="video" type="button">Video</button>
                 </div>
 
                 <label class="upload-card" for="file-input" id="drop-zone">
-                  <input id="file-input" class="visually-hidden" type="file" accept="image/*" multiple />
+                  <input id="file-input" class="visually-hidden" type="file" accept="image/*,video/mp4,video/webm" multiple />
                   <div class="upload-icon">3D</div>
-                  <p>Upload the full item photo set</p>
+                  <p id="upload-card-title">Upload the full item photo set</p>
                   <p>or</p>
-                  <span class="gold-button button-full fake-button">Start 360 Capture</span>
-                  <small>Supported: JPG, PNG, MP4, WEBM</small>
+                  <button class="gold-button button-full upload-trigger" id="upload-trigger" type="button">Start 360 Capture</button>
+                  <small id="upload-card-support">Supported: JPG, PNG, MP4, WEBM</small>
                 </label>
 
                 <div class="upload-status" aria-live="polite">
@@ -158,6 +169,14 @@
                   src="./assets/branding/pawnvision-hero.png"
                   alt="Selected item preview"
                 />
+                <video
+                  class="viewer-video is-hidden"
+                  id="viewer-video"
+                  controls
+                  muted
+                  loop
+                  playsinline
+                ></video>
               </div>
               <button class="viewer-arrow" id="next-image" type="button" aria-label="Next image">›</button>
             </div>
@@ -299,34 +318,78 @@
               </div>
             </div>
 
-            <div class="summary-block">
-              <h3>Broker controls</h3>
-              <div class="broker-controls">
-                <button class="outline-button" type="button">Assign Tag</button>
-                <button class="outline-button" type="button">Print Label</button>
-                <button class="outline-button" type="button">Ticket Print</button>
+              <div class="summary-block">
+                <h3>Broker controls</h3>
+                <div class="broker-controls">
+                <button class="outline-button" data-broker-action="assign-tag" type="button">Assign Tag</button>
+                <button class="outline-button" data-broker-action="print-label" type="button">Print Label</button>
+                <button class="outline-button" data-broker-action="ticket-print" type="button">Ticket Print</button>
+                </div>
               </div>
-            </div>
 
             <p class="disclaimer">
               AI outputs are likely findings based on uploaded photos. Final offer and authenticity
               decisions require broker review and in-person inspection.
             </p>
-            <a class="gold-button button-full" href="#contact">Submit For In-Store Review</a>
+            <button class="gold-button button-full" id="submit-review" type="button">Submit For In-Store Review</button>
             </aside>
           </section>
         </section>
+
+        <footer class="app-footer">
+          <div class="app-footer-top">
+            <div>
+              <strong>PawnVision OS</strong>
+              <p>AI-powered pawn shop operating system for digital intake, broker review, and operational control.</p>
+            </div>
+            <div class="app-footer-links">
+              <button class="footer-link" data-legal="privacy" type="button">Privacy Policy</button>
+              <button class="footer-link" data-legal="terms" type="button">Terms</button>
+              <button class="footer-link" data-legal="contact" type="button">Contact</button>
+              <button class="footer-link" data-legal="accessibility" type="button">Accessibility</button>
+              <button class="footer-link" data-legal="social" type="button">Social Links</button>
+            </div>
+          </div>
+          <div class="app-footer-bottom">
+            <span>© 2026 PawnVision OS. All rights reserved.</span>
+            <span>Powered by PawnVision OS</span>
+          </div>
+        </footer>
       </main>
     </div>
 
+    <div class="app-modal is-hidden" id="app-modal" aria-hidden="true">
+      <div class="app-modal-backdrop" data-close-modal="true"></div>
+      <div class="app-modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="app-modal-header">
+          <h2 id="modal-title">Account Access</h2>
+          <button class="modal-close" id="close-modal" type="button" aria-label="Close panel">×</button>
+        </div>
+        <div class="app-modal-body" id="modal-body"></div>
+      </div>
+    </div>
+
+    <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
     <script>
       const state = {
+        mode: "capture360",
         images: [],
+        library: {
+          capture360: [],
+          photos: [],
+          video: [],
+        },
         activeIndex: 0,
         rotation: 0,
         zoomed: false,
         tilted: false,
         lit: false,
+        auth: {
+          loggedIn: false,
+          role: "",
+          name: "",
+        },
       };
 
       const slotBlueprint = [
@@ -420,6 +483,7 @@
       const fileInput = document.getElementById("file-input");
       const dropZone = document.getElementById("drop-zone");
       const viewerImage = document.getElementById("viewer-image");
+      const viewerVideo = document.getElementById("viewer-video");
       const viewerPlaceholder = document.getElementById("viewer-placeholder");
       const viewerSurface = document.getElementById("viewer-surface");
       const recentCaptures = document.getElementById("recent-captures");
@@ -430,6 +494,171 @@
       const customerChecklist = document.getElementById("customer-checklist");
       const qualityList = document.getElementById("quality-list");
       const qualityMessage = document.getElementById("quality-message");
+      const uploadTrigger = document.getElementById("upload-trigger");
+      const uploadCardTitle = document.getElementById("upload-card-title");
+      const uploadCardSupport = document.getElementById("upload-card-support");
+      const toastStack = document.getElementById("toast-stack");
+      const appModal = document.getElementById("app-modal");
+      const modalTitle = document.getElementById("modal-title");
+      const modalBody = document.getElementById("modal-body");
+      const loginButton = document.getElementById("login-button");
+      const createAccountButton = document.getElementById("create-account-button");
+      const userMenu = document.getElementById("user-menu");
+      const userToggle = document.getElementById("user-toggle");
+      const accountDropdown = document.getElementById("account-dropdown");
+      const userAvatar = document.getElementById("user-avatar");
+      const userName = document.getElementById("user-name");
+      const userContext = document.getElementById("user-context");
+
+      function showToast(message) {
+        const toast = document.createElement("div");
+        toast.className = "toast";
+        toast.textContent = message;
+        toastStack.appendChild(toast);
+        requestAnimationFrame(() => toast.classList.add("is-visible"));
+        window.setTimeout(() => {
+          toast.classList.remove("is-visible");
+          window.setTimeout(() => toast.remove(), 180);
+        }, 2200);
+      }
+
+      function openModal(title, content) {
+        modalTitle.textContent = title;
+        modalBody.innerHTML = content;
+        appModal.classList.remove("is-hidden");
+        appModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeModal() {
+        appModal.classList.add("is-hidden");
+        appModal.setAttribute("aria-hidden", "true");
+      }
+
+      function getAllAssets() {
+        return Object.values(state.library).flat();
+      }
+
+      function syncActiveAssets() {
+        state.images = state.library[state.mode];
+        state.activeIndex = Math.min(state.activeIndex, Math.max(0, state.images.length - 1));
+      }
+
+      function updateAuthUI() {
+        const loggedIn = state.auth.loggedIn;
+        loginButton.classList.toggle("is-hidden", loggedIn);
+        createAccountButton.classList.toggle("is-hidden", loggedIn);
+        userMenu.classList.toggle("is-hidden", !loggedIn);
+
+        if (loggedIn) {
+          const initial = state.auth.name ? state.auth.name.charAt(0).toUpperCase() : "A";
+          userAvatar.textContent = initial;
+          userName.textContent = state.auth.name;
+          userContext.textContent = state.auth.role === "broker" ? "Broker workspace" : "Customer portal";
+        }
+      }
+
+      function setAuth(role, flow) {
+        state.auth.loggedIn = true;
+        state.auth.role = role;
+        state.auth.name = role === "broker" ? "Broker Admin" : "Ace Customer";
+        updateAuthUI();
+        closeModal();
+        showToast(`${flow} complete. ${role === "broker" ? "Broker dashboard" : "Customer account"} is now active.`);
+      }
+
+      function openAuthModal(defaultFlow = "login") {
+        const title = defaultFlow === "register" ? "Create Your PawnVision OS Account" : "Account Access";
+        openModal(
+          title,
+          `
+            <div class="modal-option-grid">
+              <button class="modal-option" data-modal-auth="customer">
+                <strong>Customer Login</strong>
+                <span>Manage online submissions, upload item photos, and track review status.</span>
+              </button>
+              <button class="modal-option" data-modal-auth="broker">
+                <strong>Broker Login</strong>
+                <span>Open the broker workspace, AI review panels, and inventory controls.</span>
+              </button>
+            </div>
+            <div class="modal-helper">
+              <p>${defaultFlow === "register"
+                ? "Create your account first, then choose whether you are entering as a customer or a broker."
+                : "Choose the role that matches the workflow you need to access."}</p>
+              <button class="gold-button" data-modal-auth="customer" type="button">${defaultFlow === "register" ? "Create Customer Account" : "Continue as Customer"}</button>
+            </div>
+          `
+        );
+      }
+
+      function openLegalModal(type) {
+        const library = {
+          privacy: {
+            title: "Privacy Policy",
+            body: "Customer submissions, uploaded photos, quote requests, and contact details should be processed securely and reviewed only for service, support, and operational workflow purposes."
+          },
+          terms: {
+            title: "Terms",
+            body: "PawnVision OS workflows are for intake, documentation, and broker review. Final appraisal decisions, authenticity findings, and in-store offers require manual inspection and shop-specific compliance review."
+          },
+          contact: {
+            title: "Contact",
+            body: "Need a real contact page? Use the public Contact template page to plug in store phone, email, address, and hours for each pawn shop deployment."
+          },
+          accessibility: {
+            title: "Accessibility",
+            body: "PawnVision OS should remain readable, keyboard accessible, and operational across desktop and mobile browsers while preserving the broker workflow layout."
+          },
+          social: {
+            title: "Social Links Placeholder",
+            body: "Add Facebook, Instagram, X, YouTube, or local marketplace links here when the live shop brand is ready."
+          },
+          chat: {
+            title: "Live Chat",
+            body: "Demo support panel opened. In production, this can connect to messaging, SMS, Intercom-style chat, or a broker support queue."
+          }
+        };
+
+        const entry = library[type];
+        if (!entry) {
+          return;
+        }
+
+        openModal(entry.title, `<p>${entry.body}</p>`);
+      }
+
+      function updateModeUI() {
+        const modeCopy = {
+          capture360: {
+            title: "Upload the full 360 capture set",
+            button: "Start 360 Capture",
+            support: "Supported: JPG, PNG, MP4, WEBM",
+            accept: "image/*,video/mp4,video/webm",
+          },
+          photos: {
+            title: "Upload clear still photos from every angle",
+            button: "Upload Photos",
+            support: "Supported: JPG, PNG",
+            accept: "image/*",
+          },
+          video: {
+            title: "Upload a short walkaround or rotation video",
+            button: "Upload Video",
+            support: "Supported: MP4, WEBM",
+            accept: "video/mp4,video/webm",
+          },
+        };
+
+        const current = modeCopy[state.mode];
+        uploadCardTitle.textContent = current.title;
+        uploadTrigger.textContent = current.button;
+        uploadCardSupport.textContent = current.support;
+        fileInput.setAttribute("accept", current.accept);
+
+        document.querySelectorAll(".tab").forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.mode === state.mode);
+        });
+      }
 
       function inferRole(fileName, index, usedRoles) {
         const name = fileName.toLowerCase();
@@ -478,14 +707,16 @@
       }
 
       function getChecklistMap() {
-        return new Map(state.images.map((item) => [item.role, item]));
+        return new Map(getAllAssets().map((item) => [item.role, item]));
       }
 
       function getQualityChecks() {
         const checklistMap = getChecklistMap();
-        const clearPhotos = state.images.length >= 4 && state.images.every((item) => item.width >= 700 && item.height >= 700);
-        const itemVisible = state.images.length >= 2;
-        const lightingAcceptable = state.images.length >= 3 && state.images.filter((item) => item.size > 60000).length >= Math.min(3, state.images.length);
+        const allAssets = getAllAssets();
+        const imageAssets = allAssets.filter((item) => item.mediaType === "image");
+        const clearPhotos = imageAssets.length >= 4 && imageAssets.every((item) => item.width >= 700 && item.height >= 700);
+        const itemVisible = allAssets.length >= 2;
+        const lightingAcceptable = imageAssets.length >= 3 && imageAssets.filter((item) => item.size > 60000).length >= Math.min(3, imageAssets.length);
         const multipleAngles = ["front", "back", "left", "right"].every((role) => checklistMap.has(role));
         const serialIncluded = checklistMap.has("serial");
         const damageIncluded = checklistMap.has("damage");
@@ -536,17 +767,17 @@
 
         document.getElementById("submission-status").textContent = failedRequired.length
           ? "Needs more photos"
-          : state.images.length
+          : getAllAssets().length
             ? "Ready for AI review"
             : "Awaiting upload";
 
         qualityMessage.textContent = failedRequired.length
           ? "Please add a clearer photo before submitting."
-          : state.images.length
+          : getAllAssets().length
             ? "Uploaded images are strong enough for AI-assisted review. Final offer still requires in-person inspection."
             : "Customer should upload multiple clear angles before the AI review starts.";
 
-        uploadCount.textContent = `${state.images.length} of 8 recommended views added`;
+        uploadCount.textContent = `${getAllAssets().length} of 8 recommended views added`;
         uploadHint.textContent = `${passedCount} of ${checks.length} image checks are currently satisfied.`;
       }
 
@@ -556,17 +787,18 @@
           return null;
         }
 
-        const inferred = inferCategory(state.images);
+        const allAssets = getAllAssets();
+        const inferred = inferCategory(allAssets);
         const checklistMap = getChecklistMap();
         const condition = checklistMap.has("damage")
           ? "Used item with visible wear noted"
-          : state.images.length >= 5
+          : allAssets.length >= 5
             ? "Likely good condition from uploaded photos"
             : "Limited visual evidence so far";
         const confidenceValue = Math.min(
           94,
           44 +
-            state.images.length * 6 +
+            allAssets.length * 6 +
             (checklistMap.has("serial") ? 10 : 0) +
             (checklistMap.has("damage") ? 5 : 0) +
             (checklistMap.has("capture360") ? 4 : 0)
@@ -588,8 +820,8 @@
           marketResearch: inferred.category === "Luxury watch" || inferred.category === "Collectibles"
             ? "Broker should compare specialty market comps"
             : "Broker should review local resale demand",
-          suggestedPawn: state.images.length >= 5 ? "Pending market comp review" : "Needs fuller photo set",
-          suggestedBuy: state.images.length >= 5 ? "Likely after broker inspection" : "Awaiting additional evidence",
+          suggestedPawn: allAssets.length >= 5 ? "Pending market comp review" : "Needs fuller photo set",
+          suggestedBuy: allAssets.length >= 5 ? "Likely after broker inspection" : "Awaiting additional evidence",
           authenticity: checklistMap.has("serial")
             ? "Likely authentic from uploaded photos. Needs broker review."
             : "Possible match only. Serial image needed.",
@@ -672,9 +904,21 @@
         viewerImage.style.setProperty("--image-scale", state.zoomed ? "1.22" : "1");
         viewerImage.style.setProperty("--image-tilt", state.tilted ? "-6deg" : "0deg");
         viewerImage.style.setProperty("--image-light", state.lit ? "1.12" : "1");
+        viewerVideo.style.setProperty("--image-rotation", state.rotation + "deg");
+        viewerVideo.style.setProperty("--image-scale", state.zoomed ? "1.08" : "1");
+        viewerVideo.style.setProperty("--image-tilt", state.tilted ? "-4deg" : "0deg");
+        viewerVideo.style.setProperty("--image-light", state.lit ? "1.08" : "1");
       }
 
       function renderButtonImage(item, index, className) {
+        if (item.mediaType === "video") {
+          return `
+            <button class="${className}${index === state.activeIndex ? " is-selected" : ""} video-thumb" type="button" data-index="${index}">
+              <span>▶</span>
+              <small>${item.slot.label}</small>
+            </button>
+          `;
+        }
         return `
           <button class="${className}${index === state.activeIndex ? " is-selected" : ""}" type="button" data-index="${index}">
             <img src="${item.url}" alt="${item.name}" />
@@ -687,6 +931,8 @@
 
         if (!active) {
           viewerImage.classList.add("is-hidden");
+          viewerVideo.classList.add("is-hidden");
+          viewerVideo.pause();
           viewerPlaceholder.classList.remove("is-hidden");
           openImage.setAttribute("href", "./assets/branding/pawnvision-hero.png");
           document.getElementById("active-shot-label").textContent = "Awaiting uploaded angles";
@@ -694,9 +940,18 @@
           return;
         }
 
-        viewerImage.src = active.url;
-        viewerImage.alt = active.name;
-        viewerImage.classList.remove("is-hidden");
+        if (active.mediaType === "video") {
+          viewerImage.classList.add("is-hidden");
+          viewerVideo.src = active.url;
+          viewerVideo.classList.remove("is-hidden");
+          viewerVideo.play().catch(() => {});
+        } else {
+          viewerVideo.classList.add("is-hidden");
+          viewerVideo.pause();
+          viewerImage.src = active.url;
+          viewerImage.alt = active.name;
+          viewerImage.classList.remove("is-hidden");
+        }
         viewerPlaceholder.classList.add("is-hidden");
         openImage.setAttribute("href", active.url);
       }
@@ -711,20 +966,28 @@
       }
 
       function renderUploads() {
+        syncActiveAssets();
+
         if (!state.images.length) {
           recentCaptures.innerHTML = `
-            <button class="capture-thumb placeholder-thumb is-selected" type="button"><span>1</span></button>
-            <button class="capture-thumb placeholder-thumb" type="button"><span>2</span></button>
-            <button class="capture-thumb placeholder-thumb" type="button"><span>3</span></button>
-            <button class="capture-thumb placeholder-thumb" type="button"><span>4</span></button>
+            <button class="capture-thumb placeholder-thumb is-selected" type="button" data-placeholder="upload"><span>1</span></button>
+            <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>2</span></button>
+            <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>3</span></button>
+            <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>4</span></button>
           `;
           viewerThumbs.innerHTML = `
-            <button class="angle-thumb placeholder-thumb is-selected" type="button"><span>A</span></button>
-            <button class="angle-thumb placeholder-thumb" type="button"><span>B</span></button>
-            <button class="angle-thumb placeholder-thumb" type="button"><span>C</span></button>
-            <button class="angle-thumb placeholder-thumb" type="button"><span>D</span></button>
-            <button class="angle-thumb placeholder-thumb" type="button"><span>E</span></button>
+            <button class="angle-thumb placeholder-thumb is-selected" type="button" data-placeholder="upload"><span>A</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>B</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>C</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>D</span></button>
+            <button class="angle-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>E</span></button>
           `;
+          document.querySelectorAll("[data-placeholder='upload']").forEach((button) => {
+            button.addEventListener("click", () => {
+              fileInput.click();
+              showToast("Upload a file to begin the AI review workflow.");
+            });
+          });
           updateCustomerChecklist();
           updateQualityReview();
           updateSelectedImage();
@@ -752,18 +1015,28 @@
       }
 
       async function loadFiles(fileList) {
-        const imageFiles = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
-        if (!imageFiles.length) {
+        const acceptedFiles = Array.from(fileList).filter((file) => {
+          if (state.mode === "video") {
+            return file.type.startsWith("video/");
+          }
+          return file.type.startsWith("image/");
+        });
+
+        if (!acceptedFiles.length) {
+          showToast(state.mode === "video" ? "Please upload MP4 or WEBM video files." : "Please upload JPG or PNG image files.");
           return;
         }
 
-        state.images.forEach((item) => URL.revokeObjectURL(item.url));
+        state.library[state.mode].forEach((item) => URL.revokeObjectURL(item.url));
         const usedRoles = new Set();
-        state.images = await Promise.all(
-          imageFiles.map(async (file, index) => {
+        state.library[state.mode] = await Promise.all(
+          acceptedFiles.map(async (file, index) => {
             const url = URL.createObjectURL(file);
-            const metrics = await loadImageMetrics(file, url);
-            const slot = inferRole(file.name, index, usedRoles);
+            const isVideo = file.type.startsWith("video/");
+            const metrics = isVideo ? { width: 1280, height: 720 } : await loadImageMetrics(file, url);
+            const slot = isVideo
+              ? slotBlueprint.find((entry) => entry.key === "capture360")
+              : inferRole(file.name, index, usedRoles);
             return {
               name: file.name,
               url,
@@ -772,11 +1045,13 @@
               height: metrics.height,
               slot,
               role: slot.key,
+              mediaType: isVideo ? "video" : "image",
             };
           })
         );
         state.activeIndex = 0;
         resetTransforms();
+        showToast(`${acceptedFiles.length} ${state.mode === "video" ? "video" : "file"}${acceptedFiles.length > 1 ? "s" : ""} added to ${state.mode === "capture360" ? "360 View" : state.mode}.`);
         renderUploads();
       }
 
@@ -802,8 +1077,24 @@
         loadFiles(event.dataTransfer.files);
       });
 
+      uploadTrigger.addEventListener("click", (event) => {
+        event.preventDefault();
+        fileInput.click();
+      });
+
+      document.querySelectorAll(".tab").forEach((button) => {
+        button.addEventListener("click", () => {
+          state.mode = button.dataset.mode;
+          state.activeIndex = 0;
+          updateModeUI();
+          renderUploads();
+          showToast(`${button.textContent} mode is active.`);
+        });
+      });
+
       document.getElementById("prev-image").addEventListener("click", () => {
         if (!state.images.length) {
+          showToast("Upload item media first to move through image angles.");
           return;
         }
         state.activeIndex = (state.activeIndex - 1 + state.images.length) % state.images.length;
@@ -812,6 +1103,7 @@
 
       document.getElementById("next-image").addEventListener("click", () => {
         if (!state.images.length) {
+          showToast("Upload item media first to move through image angles.");
           return;
         }
         state.activeIndex = (state.activeIndex + 1) % state.images.length;
@@ -819,29 +1111,116 @@
       });
 
       document.getElementById("rotate-tool").addEventListener("click", () => {
+        if (!state.images.length) {
+          showToast("Rotate is ready once item media has been uploaded.");
+          return;
+        }
         state.rotation = (state.rotation + 90) % 360;
         updateViewerTransform();
+        showToast("Viewer rotated.");
       });
 
       document.getElementById("zoom-tool").addEventListener("click", () => {
+        if (!state.images.length) {
+          showToast("Zoom is ready once item media has been uploaded.");
+          return;
+        }
         state.zoomed = !state.zoomed;
         updateViewerTransform();
+        showToast(state.zoomed ? "Zoom enabled." : "Zoom reset.");
       });
 
       document.getElementById("reset-tool").addEventListener("click", () => {
         resetTransforms();
+        showToast("Viewer reset.");
       });
 
       document.getElementById("tilt-tool").addEventListener("click", () => {
+        if (!state.images.length) {
+          showToast("Tilt is ready once item media has been uploaded.");
+          return;
+        }
         state.tilted = !state.tilted;
         updateViewerTransform();
+        showToast(state.tilted ? "Tilt view enabled." : "Tilt view cleared.");
       });
 
       document.getElementById("light-tool").addEventListener("click", () => {
+        if (!state.images.length) {
+          showToast("Lighting review is ready once item media has been uploaded.");
+          return;
+        }
         state.lit = !state.lit;
         updateViewerTransform();
+        showToast(state.lit ? "Lighting assist enabled." : "Lighting assist disabled.");
       });
 
+      loginButton.addEventListener("click", () => openAuthModal("login"));
+      createAccountButton.addEventListener("click", () => openAuthModal("register"));
+
+      document.getElementById("close-modal").addEventListener("click", closeModal);
+      appModal.addEventListener("click", (event) => {
+        if (event.target.dataset.closeModal === "true") {
+          closeModal();
+        }
+        const authTarget = event.target.closest("[data-modal-auth]");
+        if (authTarget) {
+          setAuth(authTarget.dataset.modalAuth, modalTitle.textContent.includes("Create") ? "Account creation" : "Login");
+        }
+      });
+
+      userToggle.addEventListener("click", () => {
+        const expanded = userToggle.getAttribute("aria-expanded") === "true";
+        userToggle.setAttribute("aria-expanded", String(!expanded));
+        accountDropdown.classList.toggle("is-hidden", expanded);
+      });
+
+      document.querySelectorAll(".account-option").forEach((button) => {
+        button.addEventListener("click", () => {
+          accountDropdown.classList.add("is-hidden");
+          userToggle.setAttribute("aria-expanded", "false");
+          if (button.dataset.auth === "logout") {
+            state.auth.loggedIn = false;
+            state.auth.role = "";
+            state.auth.name = "";
+            updateAuthUI();
+            showToast("You have been logged out.");
+            return;
+          }
+          setAuth(button.dataset.auth, "Role switch");
+        });
+      });
+
+      document.querySelector(".support-card .outline-button").addEventListener("click", (event) => {
+        event.preventDefault();
+        openLegalModal("chat");
+      });
+
+      document.querySelectorAll("[data-broker-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          button.classList.toggle("is-active");
+          const labels = {
+            "assign-tag": "Inventory tag assignment opened.",
+            "print-label": "Label print queue prepared.",
+            "ticket-print": "Ticket print workflow prepared.",
+          };
+          showToast(labels[button.dataset.brokerAction]);
+        });
+      });
+
+      document.getElementById("submit-review").addEventListener("click", () => {
+        const message = getAllAssets().length
+          ? "Submission queued for broker intake and final in-person inspection."
+          : "Upload item media before submitting for in-store review.";
+        showToast(message);
+      });
+
+      document.querySelectorAll(".footer-link").forEach((button) => {
+        button.addEventListener("click", () => openLegalModal(button.dataset.legal));
+      });
+
+      updateAuthUI();
+      updateModeUI();
       renderUploads();
     </script>
   </body>
