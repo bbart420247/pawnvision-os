@@ -1462,6 +1462,32 @@ main {
   text-transform: uppercase;
 }
 
+.step-list li.is-action {
+  padding: 0;
+}
+
+.step-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.step-trigger:hover,
+.step-trigger:focus-visible {
+  color: var(--gold-bright);
+}
+
 .step-list li:last-child {
   border-bottom: 0;
 }
@@ -1576,6 +1602,7 @@ main {
   overflow: hidden;
   display: grid;
   place-items: center;
+  isolation: isolate;
 }
 
 .viewer-placeholder {
@@ -1583,6 +1610,8 @@ main {
   place-items: center;
   width: 100%;
   height: 100%;
+  grid-area: 1 / 1;
+  z-index: 1;
 }
 
 .viewer-image {
@@ -1595,6 +1624,8 @@ main {
   place-self: center;
   object-position: center;
   object-fit: contain;
+  grid-area: 1 / 1;
+  z-index: 2;
   transform:
     rotate(var(--image-rotation, 0deg))
     scale(var(--image-scale, 1))
@@ -1613,6 +1644,8 @@ main {
   place-self: center;
   object-position: center;
   object-fit: contain;
+  grid-area: 1 / 1;
+  z-index: 2;
   transform:
     rotate(var(--image-rotation, 0deg))
     scale(var(--image-scale, 1))
@@ -1630,6 +1663,19 @@ main {
   grid-template-columns: 86px 86px 86px 86px 118px;
   justify-content: center;
   margin-top: 7px;
+}
+
+.viewer-management {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.viewer-management .outline-button {
+  min-height: 30px;
+  padding: 0 8px;
+  font-size: 0.53rem;
 }
 
 .tool-chip {
@@ -2027,6 +2073,43 @@ main {
 .modal-helper-actions {
   display: flex;
   gap: 10px;
+}
+
+.item-details-form {
+  display: grid;
+  gap: 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.form-field {
+  display: grid;
+  gap: 6px;
+}
+
+.form-field span {
+  color: var(--muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-field input,
+.form-field textarea {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text);
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.form-field textarea {
+  min-height: 82px;
 }
 
 .toast-stack {

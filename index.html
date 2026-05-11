@@ -113,7 +113,7 @@
                   <a href="#categories">View all</a>
                 </div>
 
-                <div class="capture-strip" id="recent-captures" aria-label="Recent captures">
+	                <div class="capture-strip" id="recent-captures" aria-label="Recent captures">
                   <button class="capture-thumb placeholder-thumb is-selected" type="button">
                     <span>1</span>
                   </button>
@@ -126,14 +126,18 @@
                   <button class="capture-thumb placeholder-thumb" type="button">
                     <span>4</span>
                   </button>
-                </div>
+	                </div>
 
-                <ol class="step-list">
-                  <li class="is-complete"><span>2.</span> Item details</li>
-                  <li class="is-complete"><span>3.</span> Condition</li>
-                  <li class="is-complete"><span>4.</span> Your info</li>
-                  <li class="is-current"><span>5.</span> Review &amp; submit</li>
-                </ol>
+	                <ol class="step-list">
+	                  <li class="is-complete is-action" id="item-details-step">
+	                    <button class="step-trigger" id="item-details-button" type="button">
+	                      <span>2.</span> Item details
+	                    </button>
+	                  </li>
+	                  <li class="is-complete"><span>3.</span> Condition</li>
+	                  <li class="is-complete"><span>4.</span> Your info</li>
+	                  <li class="is-current"><span>5.</span> Review &amp; submit</li>
+	                </ol>
               </aside>
 
               <aside class="panel support-card" id="contact">
@@ -181,15 +185,22 @@
               <button class="viewer-arrow" id="next-image" type="button" aria-label="Next image">›</button>
             </div>
 
-            <div class="viewer-toolbar" aria-label="Viewer controls">
-              <button class="tool-chip is-active" id="rotate-tool" type="button">Rotate</button>
-              <button class="tool-chip" id="zoom-tool" type="button">Zoom</button>
-              <button class="tool-chip" id="reset-tool" type="button">Reset</button>
-              <button class="tool-chip" id="tilt-tool" type="button">Tilt</button>
-              <button class="tool-chip" id="light-tool" type="button">Light</button>
-            </div>
+	            <div class="viewer-toolbar" aria-label="Viewer controls">
+	              <button class="tool-chip is-active" id="rotate-tool" type="button">Rotate</button>
+	              <button class="tool-chip" id="zoom-tool" type="button">Zoom</button>
+	              <button class="tool-chip" id="reset-tool" type="button">Reset</button>
+	              <button class="tool-chip" id="tilt-tool" type="button">Tilt</button>
+	              <button class="tool-chip" id="light-tool" type="button">Light</button>
+	            </div>
 
-            <div class="thumb-row" id="viewer-thumbs" aria-label="Item angles">
+	            <div class="viewer-management" aria-label="Upload management controls">
+	              <button class="outline-button" id="remove-selected-button" type="button">Remove Selected</button>
+	              <button class="outline-button" id="replace-selected-button" type="button">Replace Selected</button>
+	              <button class="outline-button" id="clear-all-button" type="button">Clear All</button>
+	              <button class="outline-button" id="reset-demo-button" type="button">Reset Demo</button>
+	            </div>
+
+	            <div class="thumb-row" id="viewer-thumbs" aria-label="Item angles">
               <button class="angle-thumb placeholder-thumb is-selected" type="button">
                 <span>A</span>
               </button>
@@ -385,11 +396,22 @@
         zoomed: false,
         tilted: false,
         lit: false,
-        auth: {
-          loggedIn: false,
-          role: "",
-          name: "",
-        },
+	        auth: {
+	          loggedIn: false,
+	          role: "",
+	          name: "",
+	        },
+	        form: {
+	          description: "",
+	          brand: "",
+	          model: "",
+	          serial: "",
+	          conditionNotes: "",
+	          accessories: "",
+	          ownerValue: "",
+	          customerNotes: "",
+	        },
+	        pendingReplace: false,
       };
 
       const slotBlueprint = [
@@ -509,6 +531,12 @@
       const userAvatar = document.getElementById("user-avatar");
       const userName = document.getElementById("user-name");
       const userContext = document.getElementById("user-context");
+      const itemDetailsButton = document.getElementById("item-details-button");
+      const itemDetailsStep = document.getElementById("item-details-step");
+      const removeSelectedButton = document.getElementById("remove-selected-button");
+      const replaceSelectedButton = document.getElementById("replace-selected-button");
+      const clearAllButton = document.getElementById("clear-all-button");
+      const resetDemoButton = document.getElementById("reset-demo-button");
 
       function showToast(message) {
         const toast = document.createElement("div");
@@ -557,6 +585,19 @@
         }
       }
 
+      function hasManualDetails() {
+        return Boolean(
+          state.form.description.trim() ||
+          state.form.brand.trim() ||
+          state.form.model.trim() ||
+          state.form.serial.trim()
+        );
+      }
+
+      function updateItemDetailsStep() {
+        itemDetailsStep.classList.toggle("is-complete", hasManualDetails());
+      }
+
       function setAuth(role, flow) {
         if (role === "demo") {
           closeModal();
@@ -595,6 +636,54 @@
                 <button class="outline-button" data-modal-auth="demo" type="button">Continue as Demo</button>
               </div>
             </div>
+          `
+        );
+      }
+
+      function openItemDetailsModal() {
+        openModal(
+          "Item Details",
+          `
+            <form class="item-details-form" id="item-details-form">
+              <div class="form-grid">
+                <label class="form-field">
+                  <span>Item Description</span>
+                  <textarea name="description" rows="2" placeholder="Describe the item">${state.form.description}</textarea>
+                </label>
+                <label class="form-field">
+                  <span>Brand</span>
+                  <input name="brand" type="text" value="${state.form.brand}" placeholder="Brand name" />
+                </label>
+                <label class="form-field">
+                  <span>Model Number</span>
+                  <input name="model" type="text" value="${state.form.model}" placeholder="Model number" />
+                </label>
+                <label class="form-field">
+                  <span>Serial Number</span>
+                  <input name="serial" type="text" value="${state.form.serial}" placeholder="Serial number" />
+                </label>
+                <label class="form-field">
+                  <span>Condition Notes</span>
+                  <textarea name="conditionNotes" rows="2" placeholder="Visible wear, issues, or condition details">${state.form.conditionNotes}</textarea>
+                </label>
+                <label class="form-field">
+                  <span>Included Accessories</span>
+                  <input name="accessories" type="text" value="${state.form.accessories}" placeholder="Box, charger, paperwork, etc." />
+                </label>
+                <label class="form-field">
+                  <span>Estimated Owner Value (Optional)</span>
+                  <input name="ownerValue" type="text" value="${state.form.ownerValue}" placeholder="Owner estimate" />
+                </label>
+                <label class="form-field">
+                  <span>Customer Notes</span>
+                  <textarea name="customerNotes" rows="2" placeholder="Anything the broker should know">${state.form.customerNotes}</textarea>
+                </label>
+              </div>
+              <div class="modal-helper-actions">
+                <button class="gold-button" type="submit">Save Item Details</button>
+                <button class="outline-button" id="clear-item-details-button" type="button">Clear Form</button>
+              </div>
+            </form>
           `
         );
       }
@@ -662,10 +751,24 @@
         uploadTrigger.textContent = current.button;
         uploadCardSupport.textContent = current.support;
         fileInput.setAttribute("accept", current.accept);
+        fileInput.multiple = state.mode !== "video";
 
         document.querySelectorAll(".tab").forEach((button) => {
           button.classList.toggle("is-active", button.dataset.mode === state.mode);
         });
+      }
+
+      function getManualSummary() {
+        return {
+          description: state.form.description.trim(),
+          brand: state.form.brand.trim(),
+          model: state.form.model.trim(),
+          serial: state.form.serial.trim(),
+          conditionNotes: state.form.conditionNotes.trim(),
+          accessories: state.form.accessories.trim(),
+          ownerValue: state.form.ownerValue.trim(),
+          customerNotes: state.form.customerNotes.trim(),
+        };
       }
 
       function inferRole(fileName, index, usedRoles) {
@@ -847,20 +950,82 @@
 
       function updateBrokerPanels() {
         const analysis = getActiveImageAnalysis();
+        const manual = getManualSummary();
 
         if (!analysis) {
           document.getElementById("active-shot-label").textContent = "Awaiting uploaded angles";
           document.getElementById("active-shot-note").textContent = "AI notes will update here when the broker selects an uploaded image.";
+          document.getElementById("condition-status").textContent = "\u00a0";
+          document.getElementById("detail-identified").textContent = "\u00a0";
+          document.getElementById("detail-brand").textContent = manual.brand || "\u00a0";
+          document.getElementById("detail-model").textContent = manual.model || "\u00a0";
+          document.getElementById("detail-condition").textContent = "\u00a0";
+          document.getElementById("detail-category").textContent = "\u00a0";
+          document.getElementById("detail-angle").textContent = "\u00a0";
+          document.getElementById("issue-primary").textContent = "\u00a0";
+          document.getElementById("issue-primary-action").textContent = "\u00a0";
+          document.getElementById("issue-secondary").textContent = "\u00a0";
+          document.getElementById("issue-secondary-action").textContent = "\u00a0";
+          document.getElementById("market-research-note").textContent = "\u00a0";
+          document.getElementById("auth-status").textContent = "\u00a0";
+          document.getElementById("auth-confidence").textContent = "\u00a0";
+          document.getElementById("broker-review-flag").textContent = "\u00a0";
+          document.getElementById("auth-note").textContent = "\u00a0";
+          document.getElementById("summary-item-name").textContent = manual.description || "\u00a0";
+          document.getElementById("summary-confidence").textContent = "Confidence pending uploaded photos";
+          document.getElementById("summary-condition").textContent = "\u00a0";
+          document.getElementById("summary-market").textContent = "\u00a0";
+          document.getElementById("summary-review").textContent = "\u00a0";
+          document.getElementById("summary-pawn-range").textContent = "\u00a0";
+          document.getElementById("summary-buy-range").textContent = "\u00a0";
+          document.getElementById("summary-visible-issues").textContent = "\u00a0";
+          document.getElementById("summary-additional-photos").textContent = "\u00a0";
+          document.getElementById("summary-resale-category").textContent = "\u00a0";
+          document.getElementById("summary-submission-status").textContent = hasManualDetails()
+            ? "Item details recorded. Awaiting media."
+            : "Awaiting upload";
+          document.getElementById("summary-note-source").textContent = hasManualDetails()
+            ? "Item details form"
+            : "\u00a0";
+          document.getElementById("summary-manual-check").textContent = hasManualDetails()
+            ? "Manual item details recorded"
+            : "Item details still needed";
+          document.getElementById("meta-brand-model").textContent = manual.brand || manual.model
+            ? [manual.brand, manual.model].filter(Boolean).join(" / ")
+            : "\u00a0";
+          document.getElementById("meta-serial").textContent = manual.serial || "\u00a0";
+          document.getElementById("meta-accessories").textContent = manual.accessories || "\u00a0";
+          document.getElementById("meta-condition").textContent = manual.conditionNotes || "\u00a0";
+          document.getElementById("meta-inventory").textContent = "\u00a0";
           return;
         }
+
+        const brandValue = manual.brand || analysis.inferred.brand;
+        const modelValue = manual.model || analysis.inferred.model;
+        const itemTitle = manual.description || `${brandValue} / ${modelValue}`;
+        const conditionValue = analysis.condition;
+        const conditionDisplay = manual.conditionNotes
+          ? `${analysis.condition} • ${manual.conditionNotes}`
+          : analysis.condition;
+        const accessoriesValue = manual.accessories || analysis.accessories;
+        const serialValue = manual.serial || analysis.serialStatus;
+        const submissionValue = hasManualDetails()
+          ? `${analysis.submissionStatus} • Item details complete`
+          : analysis.submissionStatus;
+        const noteSourceValue = hasManualDetails()
+          ? `${analysis.noteSource} + Item details form`
+          : analysis.noteSource;
+        const manualCheckValue = hasManualDetails()
+          ? "Item details recorded"
+          : "Required before final offer";
 
         document.getElementById("active-shot-label").textContent = analysis.noteSource;
         document.getElementById("active-shot-note").textContent = analysis.activeNote;
         document.getElementById("condition-status").textContent = analysis.condition;
         document.getElementById("detail-identified").textContent = analysis.inferred.category;
-        document.getElementById("detail-brand").textContent = analysis.inferred.brand;
-        document.getElementById("detail-model").textContent = analysis.inferred.model;
-        document.getElementById("detail-condition").textContent = analysis.condition;
+        document.getElementById("detail-brand").textContent = brandValue;
+        document.getElementById("detail-model").textContent = modelValue;
+        document.getElementById("detail-condition").textContent = conditionDisplay;
         document.getElementById("detail-category").textContent = analysis.inferred.category;
         document.getElementById("detail-angle").textContent = analysis.noteSource;
         document.getElementById("issue-primary").textContent = analysis.activeIssue;
@@ -877,7 +1042,7 @@
         document.getElementById("broker-review-flag").textContent = analysis.reviewFlag;
         document.getElementById("auth-note").textContent = "Final authenticity and offer decisions require manual inspection.";
 
-        document.getElementById("summary-item-name").textContent = `${analysis.inferred.brand} / ${analysis.inferred.model}`;
+        document.getElementById("summary-item-name").textContent = itemTitle;
         document.getElementById("summary-confidence").textContent = analysis.confidenceText;
         document.getElementById("summary-condition").textContent = analysis.condition;
         document.getElementById("summary-market").textContent = analysis.marketResearch;
@@ -889,14 +1054,65 @@
           ? analysis.additionalPhotos.join(", ")
           : "No additional photo request";
         document.getElementById("summary-resale-category").textContent = analysis.inferred.category;
-        document.getElementById("summary-submission-status").textContent = analysis.submissionStatus;
-        document.getElementById("summary-note-source").textContent = analysis.noteSource;
-        document.getElementById("summary-manual-check").textContent = "Required before final offer";
-        document.getElementById("meta-brand-model").textContent = `${analysis.inferred.brand} / ${analysis.inferred.model}`;
-        document.getElementById("meta-serial").textContent = analysis.serialStatus;
-        document.getElementById("meta-accessories").textContent = analysis.accessories;
-        document.getElementById("meta-condition").textContent = analysis.condition;
+        document.getElementById("summary-submission-status").textContent = submissionValue;
+        document.getElementById("summary-note-source").textContent = noteSourceValue;
+        document.getElementById("summary-manual-check").textContent = manualCheckValue;
+        document.getElementById("meta-brand-model").textContent = `${brandValue} / ${modelValue}`;
+        document.getElementById("meta-serial").textContent = serialValue;
+        document.getElementById("meta-accessories").textContent = accessoriesValue;
+        document.getElementById("meta-condition").textContent = conditionDisplay;
         document.getElementById("meta-inventory").textContent = analysis.inventoryControls;
+      }
+
+      function revokeAssets(items) {
+        items.forEach((item) => {
+          if (item?.url) {
+            URL.revokeObjectURL(item.url);
+          }
+        });
+      }
+
+      function removeSelectedImage() {
+        syncActiveAssets();
+        if (!state.images.length) {
+          showToast("There is no uploaded media to remove.");
+          return;
+        }
+        const removed = state.images.splice(state.activeIndex, 1);
+        revokeAssets(removed);
+        state.activeIndex = Math.min(state.activeIndex, Math.max(0, state.images.length - 1));
+        renderUploads();
+        showToast("Selected media removed.");
+      }
+
+      function clearAllUploads() {
+        revokeAssets(getAllAssets());
+        state.library.capture360 = [];
+        state.library.photos = [];
+        state.library.video = [];
+        state.images = [];
+        state.activeIndex = 0;
+        state.pendingReplace = false;
+        resetTransforms();
+        renderUploads();
+        showToast("All uploaded media cleared.");
+      }
+
+      function resetDemoState() {
+        clearAllUploads();
+        state.form = {
+          description: "",
+          brand: "",
+          model: "",
+          serial: "",
+          conditionNotes: "",
+          accessories: "",
+          ownerValue: "",
+          customerNotes: "",
+        };
+        updateItemDetailsStep();
+        updateBrokerPanels();
+        showToast("Demo reset to blank dashboard state.");
       }
 
       function resetTransforms() {
@@ -1031,13 +1247,21 @@
         });
 
         if (!acceptedFiles.length) {
+          state.pendingReplace = false;
           showToast(state.mode === "video" ? "Please upload MP4 or WEBM video files." : "Please upload JPG or PNG image files.");
           return;
         }
 
-        state.library[state.mode].forEach((item) => URL.revokeObjectURL(item.url));
-        const usedRoles = new Set();
-        state.library[state.mode] = await Promise.all(
+        const currentModeAssets = [...state.library[state.mode]];
+        const replacementIndex = state.pendingReplace ? state.activeIndex : -1;
+        const replacementTarget = state.pendingReplace && currentModeAssets[replacementIndex]
+          ? currentModeAssets[replacementIndex]
+          : null;
+        const globalRoles = getAllAssets()
+          .filter((item) => item !== replacementTarget)
+          .map((item) => item.role);
+        const usedRoles = new Set(globalRoles);
+        const loadedAssets = await Promise.all(
           acceptedFiles.map(async (file, index) => {
             const url = URL.createObjectURL(file);
             const isVideo = file.type.startsWith("video/");
@@ -1057,10 +1281,29 @@
             };
           })
         );
-        state.activeIndex = 0;
+
+        if (state.pendingReplace && replacementTarget) {
+          URL.revokeObjectURL(replacementTarget.url);
+          currentModeAssets.splice(replacementIndex, 1, loadedAssets[0]);
+          if (loadedAssets.length > 1) {
+            currentModeAssets.splice(replacementIndex + 1, 0, ...loadedAssets.slice(1));
+          }
+          state.library[state.mode] = currentModeAssets;
+          state.activeIndex = replacementIndex;
+        } else if (state.mode === "video") {
+          revokeAssets(currentModeAssets);
+          state.library[state.mode] = loadedAssets;
+          state.activeIndex = 0;
+        } else {
+          state.library[state.mode] = currentModeAssets.concat(loadedAssets);
+          state.activeIndex = currentModeAssets.length;
+        }
+
+        state.pendingReplace = false;
         resetTransforms();
         showToast(`${acceptedFiles.length} ${state.mode === "video" ? "video" : "file"}${acceptedFiles.length > 1 ? "s" : ""} added to ${state.mode === "capture360" ? "360 View" : state.mode}.`);
         renderUploads();
+        fileInput.value = "";
       }
 
       fileInput.addEventListener("change", (event) => {
@@ -1087,6 +1330,7 @@
 
       uploadTrigger.addEventListener("click", (event) => {
         event.preventDefault();
+        state.pendingReplace = false;
         fileInput.click();
       });
 
@@ -1165,6 +1409,19 @@
 
       loginButton.addEventListener("click", () => openAuthModal("login"));
       createAccountButton.addEventListener("click", () => openAuthModal("register"));
+      itemDetailsButton.addEventListener("click", openItemDetailsModal);
+      removeSelectedButton.addEventListener("click", removeSelectedImage);
+      replaceSelectedButton.addEventListener("click", () => {
+        syncActiveAssets();
+        if (!state.images.length) {
+          showToast("Upload media before trying to replace it.");
+          return;
+        }
+        state.pendingReplace = true;
+        fileInput.click();
+      });
+      clearAllButton.addEventListener("click", clearAllUploads);
+      resetDemoButton.addEventListener("click", resetDemoState);
 
       document.getElementById("close-modal").addEventListener("click", closeModal);
       document.addEventListener("keydown", (event) => {
@@ -1180,6 +1437,45 @@
         if (authTarget) {
           setAuth(authTarget.dataset.modalAuth, modalTitle.textContent.includes("Create") ? "Account creation" : "Login");
         }
+        if (event.target.id === "clear-item-details-button") {
+          state.form = {
+            description: "",
+            brand: "",
+            model: "",
+            serial: "",
+            conditionNotes: "",
+            accessories: "",
+            ownerValue: "",
+            customerNotes: "",
+          };
+          updateItemDetailsStep();
+          updateBrokerPanels();
+          closeModal();
+          showToast("Item details cleared.");
+        }
+      });
+
+      appModal.addEventListener("submit", (event) => {
+        const form = event.target.closest("#item-details-form");
+        if (!form) {
+          return;
+        }
+        event.preventDefault();
+        const formData = new FormData(form);
+        state.form = {
+          description: String(formData.get("description") || "").trim(),
+          brand: String(formData.get("brand") || "").trim(),
+          model: String(formData.get("model") || "").trim(),
+          serial: String(formData.get("serial") || "").trim(),
+          conditionNotes: String(formData.get("conditionNotes") || "").trim(),
+          accessories: String(formData.get("accessories") || "").trim(),
+          ownerValue: String(formData.get("ownerValue") || "").trim(),
+          customerNotes: String(formData.get("customerNotes") || "").trim(),
+        };
+        updateItemDetailsStep();
+        updateBrokerPanels();
+        closeModal();
+        showToast("Item details saved and linked to broker output.");
       });
 
       userToggle.addEventListener("click", () => {
@@ -1234,6 +1530,7 @@
 
       updateAuthUI();
       updateModeUI();
+      updateItemDetailsStep();
       renderUploads();
     </script>
   </body>
