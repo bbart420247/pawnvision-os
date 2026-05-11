@@ -558,6 +558,11 @@
       }
 
       function setAuth(role, flow) {
+        if (role === "demo") {
+          closeModal();
+          showToast("Continuing in demo mode. The public homepage remains fully available.");
+          return;
+        }
         state.auth.loggedIn = true;
         state.auth.role = role;
         state.auth.name = role === "broker" ? "Broker Admin" : "Ace Customer";
@@ -585,7 +590,10 @@
               <p>${defaultFlow === "register"
                 ? "Create your account first, then choose whether you are entering as a customer or a broker."
                 : "Choose the role that matches the workflow you need to access."}</p>
-              <button class="gold-button" data-modal-auth="customer" type="button">${defaultFlow === "register" ? "Create Customer Account" : "Continue as Customer"}</button>
+              <div class="modal-helper-actions">
+                <button class="gold-button" data-modal-auth="customer" type="button">${defaultFlow === "register" ? "Create Customer Account" : "Continue as Customer"}</button>
+                <button class="outline-button" data-modal-auth="demo" type="button">Continue as Demo</button>
+              </div>
             </div>
           `
         );
@@ -1159,6 +1167,11 @@
       createAccountButton.addEventListener("click", () => openAuthModal("register"));
 
       document.getElementById("close-modal").addEventListener("click", closeModal);
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !appModal.classList.contains("is-hidden")) {
+          closeModal();
+        }
+      });
       appModal.addEventListener("click", (event) => {
         if (event.target.dataset.closeModal === "true") {
           closeModal();

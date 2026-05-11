@@ -1916,6 +1916,10 @@ main {
   z-index: 100;
 }
 
+.app-modal.is-hidden {
+  display: none;
+}
+
 .app-modal-backdrop {
   position: absolute;
   inset: 0;
@@ -2007,6 +2011,11 @@ main {
   display: grid;
   gap: 12px;
   margin-top: 14px;
+}
+
+.modal-helper-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .toast-stack {
