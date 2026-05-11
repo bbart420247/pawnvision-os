@@ -297,11 +297,11 @@
             <div class="summary-block">
               <h3>Internal ranges</h3>
               <div class="summary-row">
-                <span>Likely pawn range</span>
+                <span>Estimated resale</span>
                 <strong id="summary-pawn-range" class="empty-value">&nbsp;</strong>
               </div>
               <div class="summary-row">
-                <span>Likely buy range</span>
+                <span>Suggested pawn offer</span>
                 <strong id="summary-buy-range" class="empty-value">&nbsp;</strong>
               </div>
             </div>
@@ -913,6 +913,123 @@
         };
       }
 
+      function getPricingProfile(inferred, thresholdMet, checklistMap, manual) {
+        if (!thresholdMet) {
+          return {
+            resale: "Locked until broker review",
+            pawn: "Locked until broker review",
+            resaleRisk: "orange",
+            pawnRisk: "orange",
+            marketText: "Additional photos requested before pricing research begins",
+            marketRisk: "orange",
+            reviewText: "Pending broker verification",
+            reviewRisk: "yellow",
+            verificationText: "Moderate confidence / more evidence needed",
+            verificationRisk: "yellow",
+          };
+        }
+
+        const hasSerial = checklistMap.has("serial") || Boolean(manual.serial);
+        const hasDamage = checklistMap.has("damage");
+        const watchLike = inferred.category === "Watch" || manual.brand.toLowerCase().includes("rolex");
+
+        if (watchLike) {
+          return hasSerial
+            ? {
+                resale: "$450–$600",
+                pawn: "$180–$275",
+                resaleRisk: "green",
+                pawnRisk: hasDamage ? "orange" : "yellow",
+                marketText: "Strong resale category / broker should confirm exact model",
+                marketRisk: "green",
+                reviewText: hasDamage ? "Condition risk check pending" : "Broker price review active",
+                reviewRisk: hasDamage ? "orange" : "yellow",
+                verificationText: "Serial provided / broker verification required",
+                verificationRisk: "yellow",
+              }
+            : {
+                resale: "$380–$520",
+                pawn: "$150–$230",
+                resaleRisk: "yellow",
+                pawnRisk: "orange",
+                marketText: "Watch category recognized / serial still needed",
+                marketRisk: "yellow",
+                reviewText: "Model and serial review required",
+                reviewRisk: "orange",
+                verificationText: "Possible luxury watch / serial not confirmed",
+                verificationRisk: "orange",
+              };
+        }
+
+        const profiles = {
+          Jewelry: {
+            resale: "$160–$280",
+            pawn: "$70–$135",
+            resaleRisk: "yellow",
+            pawnRisk: "yellow",
+            marketText: "Precious metal demand should be checked manually",
+            marketRisk: "yellow",
+          },
+          Tool: {
+            resale: "$120–$220",
+            pawn: "$45–$95",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+            marketText: "Local tool demand and battery system should be confirmed",
+            marketRisk: "yellow",
+          },
+          Firearm: {
+            resale: "$250–$420",
+            pawn: "$100–$180",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+            marketText: "Legal review and serial verification required",
+            marketRisk: "orange",
+          },
+          Console: {
+            resale: "$180–$280",
+            pawn: "$70–$120",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+            marketText: "Generation, storage, and controller set should be confirmed",
+            marketRisk: "yellow",
+          },
+          "Trading card": {
+            resale: "$60–$140",
+            pawn: "$20–$55",
+            resaleRisk: "orange",
+            pawnRisk: "red",
+            marketText: "Grading and liquidity vary heavily by card and slab",
+            marketRisk: "orange",
+          },
+        };
+
+        const profile = profiles[inferred.category] || {
+          resale: "$100–$180",
+          pawn: "$35–$75",
+          resaleRisk: "orange",
+          pawnRisk: "orange",
+          marketText: "Broker should verify resale demand and saturation manually",
+          marketRisk: "orange",
+        };
+
+        return {
+          ...profile,
+          reviewText: hasDamage ? "Condition risk check pending" : "Broker price review active",
+          reviewRisk: hasDamage ? "orange" : "yellow",
+          verificationText: hasSerial ? "Reference info provided / broker verification required" : "Pending broker verification",
+          verificationRisk: hasSerial ? "yellow" : "orange",
+        };
+      }
+
+      function applyRiskClass(element, risk) {
+        element.classList.remove("risk-green", "risk-yellow", "risk-orange", "risk-red");
+        if (!risk) {
+          return;
+        }
+        element.classList.add(`risk-${risk}`);
+      }
+
       function getQualityChecks() {
         const allAssets = getAllAssets();
         const imageAssets = allAssets.filter((item) => item.mediaType === "image");
@@ -1023,6 +1140,7 @@
           .filter((request, index) => !checklistMap.has(request.key) && !(index === 0 && allAssets.length > 0))
           .map((request) => request.label);
         const thresholdMet = evidenceStatus.thresholdMet;
+        const pricing = getPricingProfile(inferred, thresholdMet, checklistMap, manual);
         const condition = !thresholdMet
           ? "Pending broker verification"
           : watchLike
@@ -1046,25 +1164,22 @@
           confidenceText: thresholdMet ? "Pending broker verification" : "Additional photos requested",
           visibleIssues,
           additionalPhotos,
-          marketResearch: thresholdMet
-            ? watchLike
-              ? "Broker should confirm model, serial, box/papers"
-              : "Broker should review local resale demand and category comps"
-            : "Locked until the requested photo set is provided",
-          suggestedPawn: thresholdMet ? "Broker pricing review pending" : "Locked until broker review",
-          suggestedBuy: thresholdMet ? "Final buy offer after verification" : "Locked until broker review",
+          marketResearch: pricing.marketText,
+          suggestedPawn: pricing.resale,
+          suggestedBuy: pricing.pawn,
+          pricing,
           authenticity: watchLike
             ? "Possible Rolex-style luxury watch / broker verification required"
             : `Possible match: ${inferred.category}`,
           noteSource: active.slot.label,
           serialStatus: checklistMap.has("serial") || manual.serial ? "Provided for broker verification" : "Additional serial / model photo requested",
-          accessories: manual.accessories
-            ? manual.accessories
-            : checklistMap.has("accessories")
-              ? "Supporting accessories uploaded"
+          accessories: checklistMap.has("accessories")
+            ? "Supporting accessories uploaded"
+            : manual.description
+              ? `Customer note: ${manual.description}`
               : "Box / papers / accessories not provided yet",
           inventoryControls: thresholdMet ? "Assign tag after final inspection" : "Inventory controls locked until review",
-          reviewFlag: thresholdMet ? "Broker review unlocked" : "Additional photos requested",
+          reviewFlag: pricing.reviewText,
           submissionStatus: thresholdMet ? "Ready for broker intake" : "Additional photos requested",
           activeNote: thresholdMet
             ? active.slot.note
@@ -1127,6 +1242,12 @@
           document.getElementById("meta-accessories").textContent = manual.description || "\u00a0";
           document.getElementById("meta-condition").textContent = "Pending broker verification";
           document.getElementById("meta-inventory").textContent = "\u00a0";
+          applyRiskClass(document.getElementById("summary-market"), "");
+          applyRiskClass(document.getElementById("summary-review"), "");
+          applyRiskClass(document.getElementById("summary-pawn-range"), "");
+          applyRiskClass(document.getElementById("summary-buy-range"), "");
+          applyRiskClass(document.getElementById("auth-confidence"), "");
+          applyRiskClass(document.getElementById("broker-review-flag"), "");
           return;
         }
 
@@ -1166,7 +1287,7 @@
           : "Continue review";
         document.getElementById("market-research-note").textContent = analysis.marketResearch;
         document.getElementById("auth-status").textContent = analysis.authenticity;
-        document.getElementById("auth-confidence").textContent = analysis.confidenceText;
+        document.getElementById("auth-confidence").textContent = analysis.pricing.verificationText;
         document.getElementById("broker-review-flag").textContent = analysis.reviewFlag;
         document.getElementById("auth-note").textContent = analysis.thresholdMet
           ? "Final authenticity and offer decisions require manual inspection."
@@ -1194,6 +1315,12 @@
         document.getElementById("meta-accessories").textContent = accessoriesValue;
         document.getElementById("meta-condition").textContent = conditionDisplay;
         document.getElementById("meta-inventory").textContent = analysis.inventoryControls;
+        applyRiskClass(document.getElementById("summary-market"), analysis.pricing.marketRisk);
+        applyRiskClass(document.getElementById("summary-review"), analysis.pricing.reviewRisk);
+        applyRiskClass(document.getElementById("summary-pawn-range"), analysis.pricing.resaleRisk);
+        applyRiskClass(document.getElementById("summary-buy-range"), analysis.pricing.pawnRisk);
+        applyRiskClass(document.getElementById("auth-confidence"), analysis.pricing.verificationRisk);
+        applyRiskClass(document.getElementById("broker-review-flag"), analysis.pricing.reviewRisk);
       }
 
       function revokeAssets(items) {

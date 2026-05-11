@@ -1984,6 +1984,22 @@ main {
   font-size: 0.64rem;
 }
 
+.risk-green {
+  color: var(--green) !important;
+}
+
+.risk-yellow {
+  color: var(--gold-bright) !important;
+}
+
+.risk-orange {
+  color: #d98e04 !important;
+}
+
+.risk-red {
+  color: #c53030 !important;
+}
+
 .blue-accent {
   color: #6fb4e6;
 }
