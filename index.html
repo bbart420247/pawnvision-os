@@ -129,7 +129,7 @@
 	                <ol class="step-list">
 	                  <li class="is-complete is-action" id="item-details-step">
 	                    <button class="step-trigger" id="item-details-button" type="button">
-	                      <span>2.</span> Item details
+	                      <span>2.</span> Quick item details
 	                    </button>
 	                  </li>
 	                  <li class="is-complete"><span>3.</span> Condition</li>
@@ -402,10 +402,6 @@
 	          brand: "",
 	          model: "",
 	          serial: "",
-	          conditionNotes: "",
-	          accessories: "",
-	          ownerValue: "",
-	          customerNotes: "",
 	        },
 	        pendingReplace: false,
       };
@@ -719,45 +715,26 @@
 
       function openItemDetailsModal() {
         openModal(
-          "Item Details",
+          "Quick Item Details",
           `
             <form class="item-details-form" id="item-details-form">
               <div class="form-grid">
                 <label class="form-field">
-                  <span>Item Description</span>
-                  <textarea name="description" rows="2" placeholder="Describe the item">${state.form.description}</textarea>
+                  <span>Short Item Description</span>
+                  <textarea name="description" rows="2" placeholder="Rolex watch with box&#10;PS5 console&#10;14k gold chain&#10;Milwaukee drill set&#10;Pokemon cards">${state.form.description}</textarea>
                 </label>
                 <label class="form-field">
-                  <span>Brand</span>
-                  <input name="brand" type="text" value="${state.form.brand}" placeholder="Brand name" />
+                  <span>Brand / Model (Optional)</span>
+                  <input name="brand" type="text" value="${state.form.brand}" placeholder="Rolex Submariner / Sony PS5 / Milwaukee M18" />
                 </label>
                 <label class="form-field">
-                  <span>Model Number</span>
-                  <input name="model" type="text" value="${state.form.model}" placeholder="Model number" />
-                </label>
-                <label class="form-field">
-                  <span>Serial Number</span>
+                  <span>Serial Number (Optional)</span>
                   <input name="serial" type="text" value="${state.form.serial}" placeholder="Serial number" />
                 </label>
-                <label class="form-field">
-                  <span>Condition Notes</span>
-                  <textarea name="conditionNotes" rows="2" placeholder="Visible wear, issues, or condition details">${state.form.conditionNotes}</textarea>
-                </label>
-                <label class="form-field">
-                  <span>Included Accessories</span>
-                  <input name="accessories" type="text" value="${state.form.accessories}" placeholder="Box, charger, paperwork, etc." />
-                </label>
-                <label class="form-field">
-                  <span>Estimated Owner Value (Optional)</span>
-                  <input name="ownerValue" type="text" value="${state.form.ownerValue}" placeholder="Owner estimate" />
-                </label>
-                <label class="form-field">
-                  <span>Customer Notes</span>
-                  <textarea name="customerNotes" rows="2" placeholder="Anything the broker should know">${state.form.customerNotes}</textarea>
-                </label>
               </div>
+              <p class="analysis-note">Keep it simple. The photo set, short description, and optional brand / serial help the broker start the review quickly.</p>
               <div class="modal-helper-actions">
-                <button class="gold-button" type="submit">Save Item Details</button>
+                <button class="gold-button" type="submit">Save Quick Details</button>
                 <button class="outline-button" id="clear-item-details-button" type="button">Clear Form</button>
               </div>
             </form>
@@ -815,10 +792,6 @@
           brand: state.form.brand.trim(),
           model: state.form.model.trim(),
           serial: state.form.serial.trim(),
-          conditionNotes: state.form.conditionNotes.trim(),
-          accessories: state.form.accessories.trim(),
-          ownerValue: state.form.ownerValue.trim(),
-          customerNotes: state.form.customerNotes.trim(),
         };
       }
 
@@ -863,8 +836,6 @@
           manual.model,
           manual.description,
           manual.serial,
-          manual.accessories,
-          manual.customerNotes,
         ]
           .join(" ")
           .toLowerCase();
@@ -1112,7 +1083,7 @@
             ? "Item details recorded. Awaiting media."
             : "Awaiting upload";
           document.getElementById("summary-note-source").textContent = hasManualDetails()
-            ? "Item details form"
+            ? "Quick item details form"
             : "\u00a0";
           document.getElementById("summary-manual-check").textContent = hasManualDetails()
             ? "Manual item details recorded"
@@ -1121,8 +1092,8 @@
             ? [manual.brand, manual.model].filter(Boolean).join(" / ")
             : "\u00a0";
           document.getElementById("meta-serial").textContent = manual.serial || "\u00a0";
-          document.getElementById("meta-accessories").textContent = manual.accessories || "\u00a0";
-          document.getElementById("meta-condition").textContent = manual.conditionNotes || "\u00a0";
+          document.getElementById("meta-accessories").textContent = manual.description || "\u00a0";
+          document.getElementById("meta-condition").textContent = "Pending broker verification";
           document.getElementById("meta-inventory").textContent = "\u00a0";
           return;
         }
@@ -1131,16 +1102,14 @@
         const modelValue = manual.model || analysis.inferred.model;
         const itemTitle = manual.description || [brandValue, modelValue].filter(Boolean).join(" / ");
         const conditionValue = analysis.condition;
-        const conditionDisplay = manual.conditionNotes
-          ? `${analysis.condition} • ${manual.conditionNotes}`
-          : analysis.condition;
-        const accessoriesValue = manual.accessories || analysis.accessories;
+        const conditionDisplay = analysis.condition;
+        const accessoriesValue = manual.description || analysis.accessories;
         const serialValue = manual.serial || analysis.serialStatus;
         const submissionValue = hasManualDetails()
           ? `${analysis.submissionStatus} • Item details complete`
           : analysis.submissionStatus;
         const noteSourceValue = hasManualDetails()
-          ? `${analysis.noteSource} + Item details form`
+          ? `${analysis.noteSource} + Quick item details`
           : analysis.noteSource;
         const manualCheckValue = hasManualDetails()
           ? "Item details recorded"
@@ -1234,10 +1203,6 @@
           brand: "",
           model: "",
           serial: "",
-          conditionNotes: "",
-          accessories: "",
-          ownerValue: "",
-          customerNotes: "",
         };
         updateItemDetailsStep();
         updateBrokerPanels();
@@ -1559,10 +1524,6 @@
             brand: "",
             model: "",
             serial: "",
-            conditionNotes: "",
-            accessories: "",
-            ownerValue: "",
-            customerNotes: "",
           };
           updateItemDetailsStep();
           updateBrokerPanels();
@@ -1583,15 +1544,11 @@
           brand: String(formData.get("brand") || "").trim(),
           model: String(formData.get("model") || "").trim(),
           serial: String(formData.get("serial") || "").trim(),
-          conditionNotes: String(formData.get("conditionNotes") || "").trim(),
-          accessories: String(formData.get("accessories") || "").trim(),
-          ownerValue: String(formData.get("ownerValue") || "").trim(),
-          customerNotes: String(formData.get("customerNotes") || "").trim(),
         };
         updateItemDetailsStep();
         updateBrokerPanels();
         closeModal();
-        showToast("Item details saved and linked to broker output.");
+        showToast("Quick item details saved and linked to broker output.");
       });
 
       appModal.addEventListener("input", (event) => {
@@ -1605,10 +1562,6 @@
           brand: String(formData.get("brand") || "").trim(),
           model: String(formData.get("model") || "").trim(),
           serial: String(formData.get("serial") || "").trim(),
-          conditionNotes: String(formData.get("conditionNotes") || "").trim(),
-          accessories: String(formData.get("accessories") || "").trim(),
-          ownerValue: String(formData.get("ownerValue") || "").trim(),
-          customerNotes: String(formData.get("customerNotes") || "").trim(),
         };
         updateItemDetailsStep();
         updateBrokerPanels();
