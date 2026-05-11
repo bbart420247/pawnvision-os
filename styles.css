@@ -1527,7 +1527,11 @@ main {
 }
 
 .viewer-panel {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto auto auto;
+  gap: 7px;
   padding: 8px 10px 8px;
+  overflow: hidden;
 }
 
 .viewer-fullscreen {
@@ -1550,7 +1554,6 @@ main {
 .image-intel {
   display: grid;
   gap: 4px;
-  margin-top: 7px;
   padding: 8px 10px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background:
@@ -1577,7 +1580,7 @@ main {
   grid-template-columns: 44px 1fr 44px;
   gap: 6px;
   align-items: center;
-  margin-top: 7px;
+  min-height: 0;
 }
 
 .viewer-arrow {
@@ -1592,7 +1595,7 @@ main {
 
 .watch-display {
   position: relative;
-  height: 286px;
+  height: 100%;
   min-height: 0;
   border: 1px solid rgba(255, 255, 255, 0.05);
   background:
@@ -1620,7 +1623,7 @@ main {
   height: 100%;
   max-width: 100%;
   max-height: 100%;
-  padding: 18px;
+  padding: 14px;
   place-self: center;
   object-position: center;
   object-fit: contain;
@@ -1640,7 +1643,7 @@ main {
   height: 100%;
   max-width: 100%;
   max-height: 100%;
-  padding: 18px;
+  padding: 14px;
   place-self: center;
   object-position: center;
   object-fit: contain;
@@ -1662,14 +1665,12 @@ main {
   display: grid;
   grid-template-columns: 86px 86px 86px 86px 118px;
   justify-content: center;
-  margin-top: 7px;
 }
 
 .viewer-management {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
-  margin-top: 7px;
 }
 
 .viewer-management .outline-button {
@@ -1708,10 +1709,12 @@ main {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 7px;
-  margin-top: 8px;
+  min-height: 78px;
+  max-height: 78px;
   padding: 6px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(0, 0, 0, 0.16);
+  overflow: hidden;
 }
 
 .thumb-row .angle-thumb {
