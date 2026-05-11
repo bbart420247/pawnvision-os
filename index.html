@@ -75,24 +75,22 @@
                   <span class="help-dot">?</span>
                 </div>
 
-                <div class="tab-row" role="tablist" aria-label="Capture modes">
-                  <button class="tab is-active" data-mode="capture360" type="button">360 View</button>
-                  <button class="tab" data-mode="photos" type="button">Photos</button>
-                  <button class="tab" data-mode="video" type="button">Video</button>
+                <div class="tab-row" role="tablist" aria-label="Capture mode">
+                  <button class="tab is-active" data-mode="photos" type="button">Photos</button>
                 </div>
 
                 <label class="upload-card" for="file-input" id="drop-zone">
-                  <input id="file-input" class="visually-hidden" type="file" accept="image/*,video/mp4,video/webm" multiple />
-                  <div class="upload-icon">3D</div>
-                  <p id="upload-card-title">Upload the full item photo set</p>
+                  <input id="file-input" class="visually-hidden" type="file" accept="image/*" multiple />
+                  <div class="upload-icon">PH</div>
+                  <p id="upload-card-title">Upload the first clear item photo</p>
                   <p>or</p>
-                  <button class="gold-button button-full upload-trigger" id="upload-trigger" type="button">Start 360 Capture</button>
-                  <small id="upload-card-support">Supported: JPG, PNG, MP4, WEBM</small>
+                  <button class="gold-button button-full upload-trigger" id="upload-trigger" type="button">Upload Photos</button>
+                  <small id="upload-card-support">Supported: JPG, PNG</small>
                 </label>
 
                 <div class="upload-status" aria-live="polite">
-                  <strong id="upload-count">0 of 8 recommended views added</strong>
-                  <span id="upload-hint">Front, back, left, right, serial, damage, optional 360, accessory photo.</span>
+                  <strong id="upload-count">No photos uploaded yet</strong>
+                  <span id="upload-hint">Upload one clear photo to start guided evidence collection.</span>
                 </div>
 
                 <div class="customer-checklist" id="customer-checklist" aria-label="Customer photo checklist"></div>
@@ -103,9 +101,9 @@
                     <span id="submission-status">Awaiting upload</span>
                   </div>
 	                  <ul class="quality-list" id="quality-list"></ul>
-	                  <p class="quality-message" id="quality-message">
-	                    Add the recommended photo angles to prepare the item for broker review.
-	                  </p>
+                  <p class="quality-message" id="quality-message">
+                    Upload a clear first photo to begin the guided broker intake process.
+                  </p>
                 </div>
 
                 <div class="section-label">
@@ -160,7 +158,7 @@
 
             <div class="image-intel" id="image-intel">
               <strong id="active-shot-label">Awaiting uploaded angles</strong>
-              <p id="active-shot-note">AI notes will update here when the broker selects an uploaded image.</p>
+              <p id="active-shot-note">Guided intake notes will update here when the broker selects an uploaded image.</p>
             </div>
 
             <div class="viewer-stage">
@@ -254,7 +252,7 @@
                     <h3>Authenticity check</h3>
                     <p class="auth-pill empty-value" id="auth-status">&nbsp;</p>
                     <div class="confidence-row">
-                      <span>Confidence score</span>
+                      <span>Verification status</span>
                       <strong id="auth-confidence" class="empty-value">&nbsp;</strong>
                     </div>
                     <div class="confidence-row">
@@ -269,13 +267,13 @@
 
             <aside class="panel summary-panel" id="about">
             <div class="panel-heading">
-              <h2>AI appraisal summary</h2>
+              <h2>Intake review summary</h2>
             </div>
 
             <div class="value-card">
               <span>Identified item</span>
               <strong id="summary-item-name" class="empty-value">&nbsp;</strong>
-              <small id="summary-confidence">Confidence pending uploaded photos</small>
+              <small id="summary-confidence">Pending broker verification</small>
             </div>
 
             <div class="mini-stat-grid">
@@ -287,17 +285,17 @@
               <div class="mini-stat">
                 <span>Market research</span>
                 <strong id="summary-market" class="empty-value">&nbsp;</strong>
-                <small>Broker review workflow</small>
+                <small>Unlocks after minimum evidence</small>
               </div>
               <div class="mini-stat">
                 <span>Broker review</span>
                 <strong id="summary-review" class="empty-value">&nbsp;</strong>
-                <small>Final offer required</small>
+                <small>Manual inspection required</small>
               </div>
             </div>
 
             <div class="summary-block">
-              <h3>Suggested internal ranges</h3>
+              <h3>Internal ranges</h3>
               <div class="summary-row">
                 <span>Likely pawn range</span>
                 <strong id="summary-pawn-range" class="empty-value">&nbsp;</strong>
@@ -309,7 +307,7 @@
             </div>
 
             <div class="summary-block">
-              <h3>AI workflow output</h3>
+              <h3>Intake workflow output</h3>
               <div class="summary-row"><span>Visible issues</span><strong id="summary-visible-issues" class="empty-value">&nbsp;</strong></div>
               <div class="summary-row"><span>Additional photos</span><strong id="summary-additional-photos" class="empty-value">&nbsp;</strong></div>
               <div class="summary-row"><span>Resale category</span><strong id="summary-resale-category" class="empty-value">&nbsp;</strong></div>
@@ -384,12 +382,10 @@
 
     <script>
       const state = {
-        mode: "capture360",
+        mode: "photos",
         images: [],
         library: {
-          capture360: [],
           photos: [],
-          video: [],
         },
         activeIndex: 0,
         rotation: 0,
@@ -434,6 +430,33 @@
           action: "Confirm rear housing condition",
         },
         {
+          key: "side",
+          label: "Side profile",
+          required: false,
+          keywords: ["side", "profile", "edge"],
+          note: "Side profile image loaded. The broker can review thickness, edge wear, and side condition from this view.",
+          issue: "Side profile should be checked for edge wear and dents.",
+          action: "Confirm side profile wear manually",
+        },
+        {
+          key: "clasp",
+          label: "Clasp close-up",
+          required: false,
+          keywords: ["clasp", "bracelet", "closure", "buckle"],
+          note: "Clasp image loaded. Closure wear and bracelet details are visible for broker review.",
+          issue: "Clasp wear can affect value and condition grading.",
+          action: "Inspect clasp wear and function",
+        },
+        {
+          key: "crown",
+          label: "Crown close-up",
+          required: false,
+          keywords: ["crown", "pushers", "controls"],
+          note: "Control-side close-up loaded. Crown and control details are visible for broker review.",
+          issue: "Controls and crown should be checked for wear or replacement parts.",
+          action: "Verify crown and controls manually",
+        },
+        {
           key: "left",
           label: "Left side",
           required: true,
@@ -457,7 +480,7 @@
           required: true,
           keywords: ["serial", "model", "brand", "ref"],
           note: "Serial or model area is visible. Broker should verify the identifier manually before approval.",
-          issue: "Serial visibility affects confidence level.",
+          issue: "Serial or reference still needs broker verification.",
           action: "Manual serial verification required",
         },
         {
@@ -470,13 +493,31 @@
           action: "Compare condition against final inspection",
         },
         {
-          key: "capture360",
-          label: "360° capture or video",
+          key: "stamp",
+          label: "Stamp / hallmark",
           required: false,
-          keywords: ["360", "video", "spin", "rotate"],
-          note: "Multi-angle capture loaded. Rotating views improve documentation and help with condition review.",
-          issue: "Motion capture is supportive but not final proof.",
-          action: "Use capture for broker walkthrough",
+          keywords: ["stamp", "hallmark", "marking", "metal"],
+          note: "Stamp or hallmark close-up loaded. Broker can review purity or maker markings from this image.",
+          issue: "Stamp markings still require broker verification.",
+          action: "Verify hallmark or stamp manually",
+        },
+        {
+          key: "barcode",
+          label: "Barcode / slab label",
+          required: false,
+          keywords: ["barcode", "slab", "psa", "bgs", "cgc"],
+          note: "Barcode or slab label loaded. Certification details are visible for broker review.",
+          issue: "Certification details should be verified manually.",
+          action: "Review slab label and barcode",
+        },
+        {
+          key: "corners",
+          label: "Corner close-up",
+          required: false,
+          keywords: ["corner", "edges"],
+          note: "Corner close-up loaded. Edge and corner wear can be reviewed from this image.",
+          issue: "Corner wear affects collectible condition review.",
+          action: "Inspect corners and edges manually",
         },
         {
           key: "accessories",
@@ -490,17 +531,53 @@
       ];
 
       const categoryRules = [
-        { category: "Luxury watch", brand: "Rolex", model: "Luxury watch", keywords: ["rolex"] },
-        { category: "Luxury watch", brand: "Omega", model: "Luxury watch", keywords: ["omega"] },
-        { category: "Luxury watch", brand: "Tag Heuer", model: "Luxury watch", keywords: ["tag", "heuer"] },
-        { category: "Jewelry", brand: "Likely jewelry", model: "Gold / silver item", keywords: ["ring", "chain", "gold", "jewelry", "bracelet", "necklace"] },
-        { category: "Electronics", brand: "Apple", model: "Consumer electronic", keywords: ["iphone", "ipad", "macbook", "apple"] },
-        { category: "Electronics", brand: "Likely electronics", model: "Consumer device", keywords: ["laptop", "tablet", "camera", "drone", "phone"] },
-        { category: "Gaming", brand: "Likely gaming", model: "Game system", keywords: ["ps5", "xbox", "switch", "gaming"] },
-        { category: "Tools", brand: "Likely tools", model: "Professional tool", keywords: ["tool", "dewalt", "milwaukee", "makita", "snapon", "bosch"] },
-        { category: "Firearms", brand: "Requires broker review", model: "Firearm", keywords: ["glock", "firearm", "pistol", "rifle"] },
-        { category: "Collectibles", brand: "Likely collectible", model: "Collectible item", keywords: ["pokemon", "coin", "card", "comic", "collectible"] },
+        { category: "Watch", brand: "Possible luxury watch", model: "Watch style pending review", keywords: ["rolex", "omega", "tag", "heuer", "watch", "submariner", "daytona"] },
+        { category: "Jewelry", brand: "Possible jewelry item", model: "Jewelry type pending review", keywords: ["ring", "chain", "gold", "jewelry", "bracelet", "necklace", "diamond"] },
+        { category: "Tool", brand: "Possible professional tool", model: "Tool type pending review", keywords: ["tool", "dewalt", "milwaukee", "makita", "snapon", "bosch", "drill"] },
+        { category: "Firearm", brand: "Possible firearm", model: "Firearm pending review", keywords: ["glock", "firearm", "pistol", "rifle", "shotgun"] },
+        { category: "Console", brand: "Possible game console", model: "Console pending review", keywords: ["ps5", "xbox", "switch", "gaming", "console"] },
+        { category: "Trading card", brand: "Possible trading card", model: "Card pending review", keywords: ["pokemon", "card", "slab", "graded", "psa", "bgs"] },
       ];
+
+      const guidedRequestsByCategory = {
+        Watch: [
+          { key: "front", label: "Front / dial photo", prompt: "Add the clasp, serial, side profile, and crown next." },
+          { key: "clasp", label: "Clasp photo", prompt: "Show the clasp and bracelet closure detail." },
+          { key: "serial", label: "Serial / reference photo", prompt: "Capture the model or serial area clearly." },
+          { key: "side", label: "Side profile", prompt: "Add a clean side profile to show case thickness and edge wear." },
+          { key: "crown", label: "Crown close-up", prompt: "Capture the crown and controls in a tight close-up." },
+        ],
+        "Trading card": [
+          { key: "front", label: "Front of card", prompt: "Start with a straight-on front image." },
+          { key: "back", label: "Back of card", prompt: "Add the back of the card next." },
+          { key: "barcode", label: "Slab barcode", prompt: "If graded, capture the slab barcode and label." },
+          { key: "corners", label: "Corners close-up", prompt: "Add corner close-ups for condition review." },
+        ],
+        Jewelry: [
+          { key: "front", label: "Primary item photo", prompt: "Add a clasp, stamp, and side profile next." },
+          { key: "clasp", label: "Clasp close-up", prompt: "Capture the clasp or fastening mechanism clearly." },
+          { key: "stamp", label: "Metal stamp / hallmark", prompt: "Add the hallmark, metal stamp, or maker mark." },
+          { key: "side", label: "Side profile", prompt: "Add a side profile to show thickness and wear." },
+        ],
+        Tool: [
+          { key: "front", label: "Full tool photo", prompt: "Add a side profile, model plate, and working end next." },
+          { key: "side", label: "Side profile", prompt: "Show the side profile and body condition." },
+          { key: "serial", label: "Model / serial plate", prompt: "Capture the model or serial plate clearly." },
+          { key: "damage", label: "Wear / damage close-up", prompt: "Add any heavy wear or damage areas if present." },
+        ],
+        Firearm: [
+          { key: "front", label: "Full profile photo", prompt: "Add the opposite side, serial area, and markings next." },
+          { key: "back", label: "Opposite side profile", prompt: "Capture the opposite side in full." },
+          { key: "serial", label: "Serial / markings", prompt: "Add serial and manufacturer markings clearly." },
+          { key: "damage", label: "Condition close-up", prompt: "Show wear, modifications, or damage areas." },
+        ],
+        Console: [
+          { key: "front", label: "Front view", prompt: "Add the back ports, serial label, and accessories next." },
+          { key: "back", label: "Back / ports", prompt: "Capture the rear ports and labels." },
+          { key: "serial", label: "Serial label", prompt: "Add the serial or model sticker clearly." },
+          { key: "accessories", label: "Controller / cables", prompt: "Show included cables, controller, or accessories." },
+        ],
+      };
 
       const fileInput = document.getElementById("file-input");
       const dropZone = document.getElementById("drop-zone");
@@ -567,7 +644,7 @@
       }
 
       function syncActiveAssets() {
-        state.images = state.library[state.mode];
+        state.images = state.library.photos;
         state.activeIndex = Math.min(state.activeIndex, Math.max(0, state.images.length - 1));
       }
 
@@ -725,37 +802,11 @@
       }
 
       function updateModeUI() {
-        const modeCopy = {
-          capture360: {
-            title: "Upload the full 360 capture set",
-            button: "Start 360 Capture",
-            support: "Supported: JPG, PNG, MP4, WEBM",
-            accept: "image/*,video/mp4,video/webm",
-          },
-          photos: {
-            title: "Upload clear still photos from every angle",
-            button: "Upload Photos",
-            support: "Supported: JPG, PNG",
-            accept: "image/*",
-          },
-          video: {
-            title: "Upload a short walkaround or rotation video",
-            button: "Upload Video",
-            support: "Supported: MP4, WEBM",
-            accept: "video/mp4,video/webm",
-          },
-        };
-
-        const current = modeCopy[state.mode];
-        uploadCardTitle.textContent = current.title;
-        uploadTrigger.textContent = current.button;
-        uploadCardSupport.textContent = current.support;
-        fileInput.setAttribute("accept", current.accept);
-        fileInput.multiple = state.mode !== "video";
-
-        document.querySelectorAll(".tab").forEach((button) => {
-          button.classList.toggle("is-active", button.dataset.mode === state.mode);
-        });
+        uploadCardTitle.textContent = "Upload the first clear item photo";
+        uploadTrigger.textContent = "Upload Photos";
+        uploadCardSupport.textContent = "Supported: JPG, PNG";
+        fileInput.setAttribute("accept", "image/*");
+        fileInput.multiple = true;
       }
 
       function getManualSummary() {
@@ -824,13 +875,13 @@
         }
         if (images.length) {
           return {
-            category: "Luxury watch",
-            brand: manual.brand || "Rolex-style",
-            model: manual.model || "Luxury watch",
+            category: "Watch",
+            brand: manual.brand || "Possible luxury watch",
+            model: manual.model || "Watch style pending review",
           };
         }
         return {
-          category: "Broker verification required",
+          category: "Pending broker verification",
           brand: manual.brand || "Awaiting item details",
           model: manual.model || "Awaiting upload",
         };
@@ -840,38 +891,67 @@
         return new Map(getAllAssets().map((item) => [item.role, item]));
       }
 
-      function getQualityChecks() {
+      function getGuidedRequests() {
+        const inferred = inferCategory(getAllAssets());
+        return guidedRequestsByCategory[inferred.category] || guidedRequestsByCategory.Watch;
+      }
+
+      function getEvidenceStatus() {
+        const allAssets = getAllAssets();
+        const guidedRequests = getGuidedRequests();
         const checklistMap = getChecklistMap();
+        const minimumRequired = Math.min(4, guidedRequests.length);
+        const completedRequired = guidedRequests.filter((request) => checklistMap.has(request.key)).length;
+        return {
+          guidedRequests,
+          minimumRequired,
+          completedRequired,
+          thresholdMet: completedRequired >= minimumRequired && allAssets.length >= minimumRequired,
+        };
+      }
+
+      function getQualityChecks() {
         const allAssets = getAllAssets();
         const imageAssets = allAssets.filter((item) => item.mediaType === "image");
-        const clearPhotos = imageAssets.length >= 4 && imageAssets.every((item) => item.width >= 700 && item.height >= 700);
-        const itemVisible = allAssets.length >= 2;
-        const lightingAcceptable = imageAssets.length >= 3 && imageAssets.filter((item) => item.size > 60000).length >= Math.min(3, imageAssets.length);
-        const multipleAngles = ["front", "back", "left", "right"].every((role) => checklistMap.has(role));
-        const serialIncluded = checklistMap.has("serial");
-        const damageIncluded = checklistMap.has("damage");
+        const itemVisible = imageAssets.length > 0;
+        const blurCheck = imageAssets.some((item) => item.width >= 900 && item.height >= 900);
+        const lightingAcceptable = imageAssets.some((item) => item.size > 90000);
+        const angleQuality = imageAssets.length >= 2;
 
         return [
-          { label: "Image is clear", passed: clearPhotos },
           { label: "Item is visible", passed: itemVisible },
+          { label: "Blur check", passed: blurCheck },
           { label: "Lighting is acceptable", passed: lightingAcceptable },
-          { label: "Multiple angles included", passed: multipleAngles },
-          { label: "Serial / model photo included", passed: serialIncluded },
-          { label: "Damage photos included if item is used", passed: damageIncluded, optional: true },
+          { label: "Angle quality", passed: angleQuality },
         ];
       }
 
       function updateCustomerChecklist() {
+        const allAssets = getAllAssets();
+        if (!allAssets.length) {
+          customerChecklist.innerHTML = `
+            <div class="checklist-item">
+              <span class="checklist-dot">+</span>
+              <div>
+                <strong>Upload first photo</strong>
+                <small>Start with one clear full-item image. Guided requests will appear after broad category recognition.</small>
+              </div>
+            </div>
+          `;
+          return;
+        }
+
         const checklistMap = getChecklistMap();
-        customerChecklist.innerHTML = slotBlueprint
-          .map((slot) => {
-            const complete = checklistMap.has(slot.key);
+        const guidedRequests = getGuidedRequests();
+        customerChecklist.innerHTML = guidedRequests
+          .map((request, index) => {
+            const complete = checklistMap.has(request.key) || (index === 0 && allAssets.length > 0);
             return `
               <div class="checklist-item${complete ? " is-complete" : ""}">
-                <span class="checklist-dot">${complete ? "✓" : slot.required ? "!" : "+"}</span>
+                <span class="checklist-dot">${complete ? "✓" : "!"}</span>
                 <div>
-                  <strong>${slot.label}</strong>
-                  <small>${complete ? "Uploaded" : slot.required ? "Required before submission" : "Optional support image"}</small>
+                  <strong>${request.label}</strong>
+                  <small>${complete ? "Provided" : "Additional photo requested"}</small>
                 </div>
               </div>
             `;
@@ -881,34 +961,47 @@
 
       function updateQualityReview() {
         const checks = getQualityChecks();
-        const failedRequired = checks.filter((check) => !check.passed && !check.optional);
-        const passedCount = checks.filter((check) => check.passed).length;
+        const failedRequired = checks.filter((check) => !check.passed);
+        const allAssets = getAllAssets();
+        const inferred = inferCategory(allAssets);
+        const evidenceStatus = getEvidenceStatus();
+        const guidedRequests = evidenceStatus.guidedRequests
+          .filter((request, index) => !getChecklistMap().has(request.key) && !(index === 0 && allAssets.length > 0))
+          .map((request) => request.label);
 
         qualityList.innerHTML = checks
           .map(
             (check) => `
               <li class="quality-item ${check.passed ? "is-pass" : "is-warn"}">
                 <span>${check.label}</span>
-                <strong>${check.passed ? "Ready" : check.optional ? "Recommended" : "Needed"}</strong>
+                <strong>${check.passed ? "Ready" : "Needs review"}</strong>
               </li>
             `
           )
           .join("");
 
-        document.getElementById("submission-status").textContent = failedRequired.length
-          ? "Needs more photos"
-          : getAllAssets().length
-            ? "Ready for AI review"
-            : "Awaiting upload";
+        document.getElementById("submission-status").textContent = !allAssets.length
+          ? "Awaiting upload"
+          : evidenceStatus.thresholdMet
+            ? "Ready for broker review"
+            : "Additional photos requested";
 
-        qualityMessage.textContent = failedRequired.length
-          ? "Add the remaining recommended angles for a stronger broker review package."
-          : getAllAssets().length
-            ? "Uploaded images are strong enough for AI-assisted review. Final offer still requires in-person inspection."
-            : "Customer should upload multiple clear angles before the AI review starts.";
+        qualityMessage.textContent = !allAssets.length
+          ? "Upload a clear first photo to begin the guided broker intake process."
+          : failedRequired.length
+            ? "Possible match recorded. Additional photos requested before broker review unlocks."
+            : evidenceStatus.thresholdMet
+              ? "Minimum evidence received. Broker review, condition analysis, and market research are now available."
+              : "Initial quality checks passed. Add the requested angles to unlock broker review.";
 
-        uploadCount.textContent = `${getAllAssets().length} of 8 recommended views added`;
-        uploadHint.textContent = `${passedCount} of ${checks.length} image checks are currently satisfied.`;
+        uploadCount.textContent = !allAssets.length
+          ? "No photos uploaded yet"
+          : `Possible match: ${inferred.category}`;
+        uploadHint.textContent = !allAssets.length
+          ? "Upload one clear photo to start guided evidence collection."
+          : guidedRequests.length
+            ? `Additional photos requested: ${guidedRequests.join(", ")}.`
+            : "Pending broker verification.";
       }
 
       function getActiveImageAnalysis() {
@@ -921,63 +1014,64 @@
         const inferred = inferCategory(allAssets);
         const checklistMap = getChecklistMap();
         const manual = getManualSummary();
-        const watchLike = inferred.category === "Luxury watch";
-        const condition = checklistMap.has("damage")
-          ? "Used luxury watch with visible wear check pending"
+        const watchLike = inferred.category === "Watch" || manual.brand.toLowerCase().includes("rolex");
+        const evidenceStatus = getEvidenceStatus();
+        const additionalPhotos = evidenceStatus.guidedRequests
+          .filter((request, index) => !checklistMap.has(request.key) && !(index === 0 && allAssets.length > 0))
+          .map((request) => request.label);
+        const thresholdMet = evidenceStatus.thresholdMet;
+        const condition = !thresholdMet
+          ? "Pending broker verification"
           : watchLike
             ? "Used luxury watch with visible wear check pending"
-            : allAssets.length >= 5
-              ? "Item condition looks consistent from uploaded photos"
-              : "Broker verification required";
-        const confidenceValue = Math.min(
-          96,
-          (watchLike ? 92 : 72) +
-            allAssets.length * 6 +
-            (checklistMap.has("serial") || manual.serial ? 4 : 0) +
-            (checklistMap.has("damage") ? 2 : 0) +
-            (checklistMap.has("capture360") ? 4 : 0)
-        );
-        const visibleIssues = checklistMap.has("damage")
-          ? "Visible wear noted from uploaded close-ups. Broker should confirm severity."
-          : watchLike
-            ? "No major damage visible from uploaded watch photos. Wear check still required."
-            : "No major damage visible from uploaded photos.";
-        const additionalPhotos = slotBlueprint
-          .filter((slot) => slot.required && !checklistMap.has(slot.key))
-          .map((slot) => slot.label);
+            : checklistMap.has("damage")
+              ? "Visible wear noted from uploaded close-ups"
+              : "Condition review available from submitted photos";
+        const visibleIssues = !thresholdMet
+          ? "Initial image received. Additional angles requested before condition findings are shown."
+          : checklistMap.has("damage")
+            ? "Visible wear noted from uploaded close-ups. Broker should confirm severity."
+            : watchLike
+              ? "No major damage visible from uploaded watch photos. Wear check still required."
+              : "No major damage visible from the current photo set.";
 
         return {
           active,
           inferred,
+          thresholdMet,
           condition,
-          confidenceText: watchLike ? `${Math.max(confidenceValue, 92)}% visual category match` : `${confidenceValue}% visual category match`,
+          confidenceText: thresholdMet ? "Pending broker verification" : "Additional photos requested",
           visibleIssues,
           additionalPhotos,
-          marketResearch: watchLike
-            ? "Broker should confirm model, serial, box/papers"
-            : inferred.category === "Collectibles"
-              ? "Broker should compare specialty market comps"
-              : "Broker should review local resale demand",
-          suggestedPawn: allAssets.length >= 5 ? "Broker pricing review pending" : "Awaiting full review set",
-          suggestedBuy: allAssets.length >= 5 ? "Final buy offer after verification" : "Awaiting additional evidence",
-          authenticity: checklistMap.has("serial") || manual.serial
-            ? "Rolex-style luxury watch / broker verification required"
-            : watchLike
-              ? "Rolex-style luxury watch / broker verification required"
-              : "Broker verification required",
+          marketResearch: thresholdMet
+            ? watchLike
+              ? "Broker should confirm model, serial, box/papers"
+              : "Broker should review local resale demand and category comps"
+            : "Locked until the requested photo set is provided",
+          suggestedPawn: thresholdMet ? "Broker pricing review pending" : "Locked until broker review",
+          suggestedBuy: thresholdMet ? "Final buy offer after verification" : "Locked until broker review",
+          authenticity: watchLike
+            ? "Possible Rolex-style luxury watch / broker verification required"
+            : `Possible match: ${inferred.category}`,
           noteSource: active.slot.label,
-          serialStatus: checklistMap.has("serial") || manual.serial ? "Provided for manual verification" : "Broker should request serial / model photo",
+          serialStatus: checklistMap.has("serial") || manual.serial ? "Provided for broker verification" : "Additional serial / model photo requested",
           accessories: manual.accessories
             ? manual.accessories
             : checklistMap.has("accessories")
               ? "Supporting accessories uploaded"
               : "Box / papers / accessories not provided yet",
-          inventoryControls: "Assign tag after final inspection",
-          reviewFlag: "Needs broker review",
-          submissionStatus: additionalPhotos.length ? "Awaiting full photo set" : "Ready for broker intake",
-          activeNote: active.slot.note,
-          activeIssue: active.slot.issue,
-          activeAction: active.slot.action,
+          inventoryControls: thresholdMet ? "Assign tag after final inspection" : "Inventory controls locked until review",
+          reviewFlag: thresholdMet ? "Broker review unlocked" : "Additional photos requested",
+          submissionStatus: thresholdMet ? "Ready for broker intake" : "Additional photos requested",
+          activeNote: thresholdMet
+            ? active.slot.note
+            : `Possible match: ${inferred.category}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Pending broker verification."}`,
+          activeIssue: thresholdMet
+            ? active.slot.issue
+            : "Additional evidence is required before condition findings are shown.",
+          activeAction: thresholdMet
+            ? active.slot.action
+            : additionalPhotos[0] || "Pending broker verification",
         };
       }
 
@@ -987,7 +1081,7 @@
 
         if (!analysis) {
           document.getElementById("active-shot-label").textContent = "Awaiting uploaded angles";
-          document.getElementById("active-shot-note").textContent = "AI notes will update here when the broker selects an uploaded image.";
+          document.getElementById("active-shot-note").textContent = "Guided intake notes will update here when the broker selects an uploaded image.";
           document.getElementById("condition-status").textContent = "\u00a0";
           document.getElementById("detail-identified").textContent = "\u00a0";
           document.getElementById("detail-brand").textContent = manual.brand || "\u00a0";
@@ -1005,7 +1099,7 @@
           document.getElementById("broker-review-flag").textContent = "\u00a0";
           document.getElementById("auth-note").textContent = "\u00a0";
           document.getElementById("summary-item-name").textContent = manual.description || "\u00a0";
-          document.getElementById("summary-confidence").textContent = "Confidence pending uploaded photos";
+          document.getElementById("summary-confidence").textContent = "Pending broker verification";
           document.getElementById("summary-condition").textContent = "\u00a0";
           document.getElementById("summary-market").textContent = "\u00a0";
           document.getElementById("summary-review").textContent = "\u00a0";
@@ -1062,7 +1156,7 @@
         document.getElementById("detail-category").textContent = analysis.inferred.category;
         document.getElementById("detail-angle").textContent = analysis.noteSource;
         document.getElementById("issue-primary").textContent = analysis.activeIssue;
-        document.getElementById("issue-primary-action").textContent = "Needs broker review";
+        document.getElementById("issue-primary-action").textContent = analysis.thresholdMet ? "Needs broker review" : "Upload requested photo";
         document.getElementById("issue-secondary").textContent = analysis.additionalPhotos.length
           ? `Additional photo recommended: ${analysis.additionalPhotos[0]}`
           : "No extra photo request from current image set";
@@ -1073,11 +1167,13 @@
         document.getElementById("auth-status").textContent = analysis.authenticity;
         document.getElementById("auth-confidence").textContent = analysis.confidenceText;
         document.getElementById("broker-review-flag").textContent = analysis.reviewFlag;
-        document.getElementById("auth-note").textContent = "Final authenticity and offer decisions require manual inspection.";
+        document.getElementById("auth-note").textContent = analysis.thresholdMet
+          ? "Final authenticity and offer decisions require manual inspection."
+          : "Deeper review stays locked until the requested photo set is provided.";
 
         document.getElementById("summary-item-name").textContent = itemTitle;
         document.getElementById("summary-confidence").textContent = analysis.confidenceText;
-        document.getElementById("summary-condition").textContent = analysis.condition;
+        document.getElementById("summary-condition").textContent = analysis.thresholdMet ? analysis.condition : "Pending broker verification";
         document.getElementById("summary-market").textContent = analysis.marketResearch;
         document.getElementById("summary-review").textContent = analysis.reviewFlag;
         document.getElementById("summary-pawn-range").textContent = analysis.suggestedPawn;
@@ -1085,7 +1181,9 @@
         document.getElementById("summary-visible-issues").textContent = analysis.visibleIssues;
         document.getElementById("summary-additional-photos").textContent = analysis.additionalPhotos.length
           ? analysis.additionalPhotos.join(", ")
-          : "No additional photo request";
+          : analysis.thresholdMet
+            ? "No additional photo request"
+            : "Pending broker verification";
         document.getElementById("summary-resale-category").textContent = analysis.inferred.category;
         document.getElementById("summary-submission-status").textContent = submissionValue;
         document.getElementById("summary-note-source").textContent = noteSourceValue;
@@ -1120,9 +1218,7 @@
 
       function clearAllUploads() {
         revokeAssets(getAllAssets());
-        state.library.capture360 = [];
         state.library.photos = [];
-        state.library.video = [];
         state.images = [];
         state.activeIndex = 0;
         state.pendingReplace = false;
@@ -1193,7 +1289,7 @@
           viewerPlaceholder.classList.remove("is-hidden");
           openImage.setAttribute("href", "./assets/branding/pawnvision-hero.png");
           document.getElementById("active-shot-label").textContent = "Awaiting uploaded angles";
-          document.getElementById("active-shot-note").textContent = "AI notes will update here when the broker selects an uploaded image.";
+          document.getElementById("active-shot-note").textContent = "Guided intake notes will update here when the broker selects an uploaded image.";
           return;
         }
 
@@ -1242,7 +1338,7 @@
           document.querySelectorAll("[data-placeholder='upload']").forEach((button) => {
             button.addEventListener("click", () => {
               fileInput.click();
-              showToast("Upload a file to begin the AI review workflow.");
+              showToast("Upload a file to begin the guided intake workflow.");
             });
           });
           updateCustomerChecklist();
@@ -1272,20 +1368,15 @@
       }
 
       async function loadFiles(fileList) {
-        const acceptedFiles = Array.from(fileList).filter((file) => {
-          if (state.mode === "video") {
-            return file.type.startsWith("video/");
-          }
-          return file.type.startsWith("image/");
-        });
+        const acceptedFiles = Array.from(fileList).filter((file) => file.type.startsWith("image/"));
 
         if (!acceptedFiles.length) {
           state.pendingReplace = false;
-          showToast(state.mode === "video" ? "Please upload MP4 or WEBM video files." : "Please upload JPG or PNG image files.");
+          showToast("Please upload JPG or PNG image files.");
           return;
         }
 
-        const currentModeAssets = [...state.library[state.mode]];
+        const currentModeAssets = [...state.library.photos];
         const replacementIndex = state.pendingReplace ? state.activeIndex : -1;
         const replacementTarget = state.pendingReplace && currentModeAssets[replacementIndex]
           ? currentModeAssets[replacementIndex]
@@ -1297,11 +1388,8 @@
         const loadedAssets = await Promise.all(
           acceptedFiles.map(async (file, index) => {
             const url = URL.createObjectURL(file);
-            const isVideo = file.type.startsWith("video/");
-            const metrics = isVideo ? { width: 1280, height: 720 } : await loadImageMetrics(file, url);
-            const slot = isVideo
-              ? slotBlueprint.find((entry) => entry.key === "capture360")
-              : inferRole(file.name, index, usedRoles);
+            const metrics = await loadImageMetrics(file, url);
+            const slot = inferRole(file.name, index, usedRoles);
             return {
               name: file.name,
               url,
@@ -1310,7 +1398,7 @@
               height: metrics.height,
               slot,
               role: slot.key,
-              mediaType: isVideo ? "video" : "image",
+              mediaType: "image",
             };
           })
         );
@@ -1321,20 +1409,16 @@
           if (loadedAssets.length > 1) {
             currentModeAssets.splice(replacementIndex + 1, 0, ...loadedAssets.slice(1));
           }
-          state.library[state.mode] = currentModeAssets;
+          state.library.photos = currentModeAssets;
           state.activeIndex = replacementIndex;
-        } else if (state.mode === "video") {
-          revokeAssets(currentModeAssets);
-          state.library[state.mode] = loadedAssets;
-          state.activeIndex = 0;
         } else {
-          state.library[state.mode] = currentModeAssets.concat(loadedAssets);
+          state.library.photos = currentModeAssets.concat(loadedAssets);
           state.activeIndex = currentModeAssets.length;
         }
 
         state.pendingReplace = false;
         resetTransforms();
-        showToast(`${acceptedFiles.length} ${state.mode === "video" ? "video" : "file"}${acceptedFiles.length > 1 ? "s" : ""} added to ${state.mode === "capture360" ? "360 View" : state.mode}.`);
+        showToast(`${acceptedFiles.length} photo${acceptedFiles.length > 1 ? "s" : ""} added to the intake workflow.`);
         renderUploads();
         fileInput.value = "";
       }
@@ -1369,11 +1453,10 @@
 
       document.querySelectorAll(".tab").forEach((button) => {
         button.addEventListener("click", () => {
-          state.mode = button.dataset.mode;
-          state.activeIndex = 0;
+          state.mode = "photos";
           updateModeUI();
           renderUploads();
-          showToast(`${button.textContent} mode is active.`);
+          showToast("Photo intake mode is active.");
         });
       });
 
