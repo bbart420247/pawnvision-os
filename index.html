@@ -87,6 +87,18 @@
                   <span id="upload-hint">Upload one clear photo to start guided evidence collection.</span>
                 </div>
 
+                <div class="quick-description-block">
+                  <label class="form-field" for="quick-description">
+                    <span>Describe your item</span>
+                    <textarea
+                      id="quick-description"
+                      rows="2"
+                      placeholder="PS5 console&#10;Gold chain&#10;Pokemon cards&#10;Dell gaming laptop&#10;Milwaukee drill&#10;Rolex watch"
+                    ></textarea>
+                  </label>
+                  <p class="analysis-note">One short description plus your photos gives PawnVision OS the context it needs for category and pricing.</p>
+                </div>
+
                 <div class="customer-checklist" id="customer-checklist" aria-label="Customer photo checklist"></div>
 
                 <div class="quality-review">
@@ -656,6 +668,7 @@
       const userContext = document.getElementById("user-context");
       const itemDetailsButton = document.getElementById("item-details-button");
       const itemDetailsStep = document.getElementById("item-details-step");
+      const quickDescriptionInput = document.getElementById("quick-description");
       const removeSelectedButton = document.getElementById("remove-selected-button");
       const replaceSelectedButton = document.getElementById("replace-selected-button");
       const clearAllButton = document.getElementById("clear-all-button");
@@ -719,6 +732,12 @@
 
       function updateItemDetailsStep() {
         itemDetailsStep.classList.toggle("is-complete", hasManualDetails());
+      }
+
+      function syncVisibleDescriptionField() {
+        if (quickDescriptionInput) {
+          quickDescriptionInput.value = state.form.description;
+        }
       }
 
       function setAuth(role, flow) {
@@ -1448,7 +1467,9 @@
           model: "",
           serial: "",
         };
+        syncVisibleDescriptionField();
         updateItemDetailsStep();
+        updateQualityReview();
         updateBrokerPanels();
         showToast("Demo reset to blank dashboard state.");
       }
@@ -1902,7 +1923,9 @@
             model: "",
             serial: "",
           };
+          syncVisibleDescriptionField();
           updateItemDetailsStep();
+          updateQualityReview();
           updateBrokerPanels();
           closeModal();
           showToast("Item details cleared.");
@@ -1922,7 +1945,9 @@
           model: String(formData.get("model") || "").trim(),
           serial: String(formData.get("serial") || "").trim(),
         };
+        syncVisibleDescriptionField();
         updateItemDetailsStep();
+        updateQualityReview();
         updateBrokerPanels();
         closeModal();
         showToast("Quick item details saved and linked to broker output.");
@@ -1940,7 +1965,9 @@
           model: String(formData.get("model") || "").trim(),
           serial: String(formData.get("serial") || "").trim(),
         };
+        syncVisibleDescriptionField();
         updateItemDetailsStep();
+        updateQualityReview();
         updateBrokerPanels();
       });
 
@@ -1966,11 +1993,6 @@
         });
       });
 
-      document.querySelector(".support-card .outline-button").addEventListener("click", (event) => {
-        event.preventDefault();
-        openLegalModal("chat");
-      });
-
       document.querySelectorAll("[data-broker-action]").forEach((button) => {
         button.addEventListener("click", () => {
           button.classList.toggle("is-active");
@@ -1994,8 +2016,16 @@
         button.addEventListener("click", () => openLegalModal(button.dataset.legal));
       });
 
+      quickDescriptionInput.addEventListener("input", (event) => {
+        state.form.description = event.target.value.trim();
+        updateItemDetailsStep();
+        updateQualityReview();
+        updateBrokerPanels();
+      });
+
       updateAuthUI();
       updateModeUI();
+      syncVisibleDescriptionField();
       updateItemDetailsStep();
       renderUploads();
     </script>
