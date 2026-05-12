@@ -129,7 +129,7 @@
 	                <ol class="step-list">
 	                  <li class="is-complete is-action" id="item-details-step">
 	                    <button class="step-trigger" id="item-details-button" type="button">
-	                      <span>2.</span> Quick item details
+	                      <span>2.</span> Describe item
 	                    </button>
 	                  </li>
 	                  <li class="is-complete"><span>3.</span> Condition</li>
@@ -556,12 +556,18 @@
       ];
 
       const categoryRules = [
-        { category: "Watch", brand: "Possible luxury watch", model: "Watch style pending review", keywords: ["rolex", "omega", "tag", "heuer", "watch", "submariner", "daytona"] },
-        { category: "Jewelry", brand: "Possible jewelry item", model: "Jewelry type pending review", keywords: ["ring", "chain", "gold", "jewelry", "bracelet", "necklace", "diamond"] },
-        { category: "Tool", brand: "Possible professional tool", model: "Tool type pending review", keywords: ["tool", "dewalt", "milwaukee", "makita", "snapon", "bosch", "drill"] },
-        { category: "Firearm", brand: "Possible firearm", model: "Firearm pending review", keywords: ["glock", "firearm", "pistol", "rifle", "shotgun"] },
-        { category: "Console", brand: "Possible game console", model: "Console pending review", keywords: ["ps5", "xbox", "switch", "gaming", "console"] },
-        { category: "Trading card", brand: "Possible trading card", model: "Card pending review", keywords: ["pokemon", "card", "slab", "graded", "psa", "bgs"] },
+        { category: "Trading card", brand: "Possible trading card", model: "Card or slab pending review", keywords: ["pokemon", "card", "slab", "graded", "psa", "bgs", "cgc", "sports card", "tcg"] },
+        { category: "Laptop", brand: "Possible laptop", model: "Laptop pending review", keywords: ["laptop", "notebook", "macbook", "dell laptop", "hp laptop", "lenovo", "chromebook"] },
+        { category: "Computer", brand: "Possible computer", model: "Computer pending review", keywords: ["computer", "desktop", "pc", "tower", "imac"] },
+        { category: "Phone", brand: "Possible phone", model: "Phone pending review", keywords: ["iphone", "phone", "galaxy", "pixel", "smartphone", "cell phone"] },
+        { category: "Camera", brand: "Possible camera", model: "Camera pending review", keywords: ["camera", "canon", "nikon", "sony camera", "dslr", "mirrorless"] },
+        { category: "Audio equipment", brand: "Possible audio equipment", model: "Audio gear pending review", keywords: ["speaker", "headphones", "mic", "microphone", "receiver", "audio", "listening device", "amplifier"] },
+        { category: "Watch", brand: "Possible watch", model: "Watch style pending review", keywords: ["rolex", "omega", "tag", "heuer", "watch", "submariner", "daytona", "wristwatch"] },
+        { category: "Jewelry", brand: "Possible jewelry item", model: "Jewelry type pending review", keywords: ["ring", "chain", "gold", "jewelry", "bracelet", "necklace", "diamond", "earring"] },
+        { category: "Tool", brand: "Possible professional tool", model: "Tool type pending review", keywords: ["tool", "dewalt", "milwaukee", "makita", "snapon", "bosch", "drill", "impact"] },
+        { category: "Firearm", brand: "Possible firearm", model: "Firearm pending review", keywords: ["glock", "firearm", "pistol", "rifle", "shotgun", "handgun"] },
+        { category: "Console", brand: "Possible game console", model: "Console pending review", keywords: ["ps5", "xbox", "switch", "gaming", "console", "playstation"] },
+        { category: "Collectible", brand: "Possible collectible", model: "Collectible pending review", keywords: ["collectible", "coin", "comic", "memorabilia", "figurine"] },
       ];
 
       const guidedRequestsByCategory = {
@@ -601,6 +607,48 @@
           { key: "back", label: "Back / ports", prompt: "Capture the rear ports and labels." },
           { key: "serial", label: "Serial label", prompt: "Add the serial or model sticker clearly." },
           { key: "accessories", label: "Controller / cables", prompt: "Show included cables, controller, or accessories." },
+        ],
+        Laptop: [
+          { key: "front", label: "Front / open view", prompt: "Add the keyboard, ports, and bottom label next." },
+          { key: "side", label: "Side ports", prompt: "Capture the ports and side profile clearly." },
+          { key: "serial", label: "Bottom label / serial", prompt: "Add the bottom serial or model label." },
+          { key: "damage", label: "Screen or case wear", prompt: "Show any cracked corners, dents, or screen wear." },
+        ],
+        Computer: [
+          { key: "front", label: "Front view", prompt: "Add rear ports, serial label, and side panel next." },
+          { key: "back", label: "Rear ports", prompt: "Capture ports and rear labels clearly." },
+          { key: "serial", label: "Serial / service tag", prompt: "Add the service tag or serial label." },
+          { key: "side", label: "Side panel", prompt: "Show side condition and casing." },
+        ],
+        Phone: [
+          { key: "front", label: "Screen photo", prompt: "Add the back, side profile, and IMEI or serial label next." },
+          { key: "back", label: "Back photo", prompt: "Capture the back housing and camera area." },
+          { key: "side", label: "Side profile", prompt: "Show buttons, frame wear, and edge condition." },
+          { key: "serial", label: "IMEI / serial label", prompt: "Add the IMEI or serial screen / label." },
+        ],
+        Camera: [
+          { key: "front", label: "Front / lens view", prompt: "Add top controls, side ports, and serial label next." },
+          { key: "side", label: "Side ports", prompt: "Capture side ports and connection covers." },
+          { key: "serial", label: "Serial label", prompt: "Add the serial or model label clearly." },
+          { key: "damage", label: "Body wear close-up", prompt: "Show lens, mount, or body wear areas." },
+        ],
+        "Audio equipment": [
+          { key: "front", label: "Front view", prompt: "Add rear panel, model label, and side condition next." },
+          { key: "back", label: "Rear inputs / outputs", prompt: "Capture the rear panel and ports." },
+          { key: "serial", label: "Model / serial label", prompt: "Add the model or serial label." },
+          { key: "side", label: "Side profile", prompt: "Show cabinet or housing condition." },
+        ],
+        Collectible: [
+          { key: "front", label: "Primary front view", prompt: "Add the back, markings, and any grading labels next." },
+          { key: "back", label: "Back view", prompt: "Capture the rear surface or packaging." },
+          { key: "serial", label: "Markings / labels", prompt: "Add maker marks, labels, or certification identifiers." },
+          { key: "damage", label: "Condition close-up", prompt: "Show any chips, wear, or damage." },
+        ],
+        Unknown: [
+          { key: "front", label: "Primary front view", prompt: "Start with one clear front image." },
+          { key: "back", label: "Back / reverse side", prompt: "Add the reverse side or back of the item." },
+          { key: "serial", label: "Label / serial / markings", prompt: "Add any labels, serials, or maker markings." },
+          { key: "side", label: "Side profile", prompt: "Capture a side angle to show thickness and edges." },
         ],
       };
 
@@ -749,7 +797,7 @@
 
       function openItemDetailsModal() {
         openModal(
-          "Quick Item Details",
+          "Describe Your Item",
           `
             <form class="item-details-form" id="item-details-form">
               <div class="form-grid">
@@ -766,9 +814,9 @@
                   <input name="serial" type="text" value="${state.form.serial}" placeholder="Serial number" />
                 </label>
               </div>
-              <p class="analysis-note">Keep it simple. The photo set, short description, and optional brand / serial help the broker start the review quickly.</p>
+              <p class="analysis-note">Keep it simple. One short description plus optional brand or serial helps category detection start before broker review.</p>
               <div class="modal-helper-actions">
-                <button class="gold-button" type="submit">Save Quick Details</button>
+                <button class="gold-button" type="submit">Save Description</button>
                 <button class="outline-button" id="clear-item-details-button" type="button">Clear Form</button>
               </div>
             </form>
@@ -874,21 +922,29 @@
           .join(" ")
           .toLowerCase();
         const searchText = `${combined} ${manualCombined}`.trim();
+        const hasDescription = Boolean(manual.description);
+
+        if (!hasDescription) {
+          return {
+            category: "Description required",
+            brand: manual.brand || "Add a short item description",
+            model: manual.model || "Category detection starts after description",
+            confidence: 0,
+          };
+        }
+
         const match = categoryRules.find((rule) => rule.keywords.some((keyword) => searchText.includes(keyword)));
         if (match) {
-          return match;
-        }
-        if (images.length) {
           return {
-            category: "Watch",
-            brand: manual.brand || "Possible luxury watch",
-            model: manual.model || "Watch style pending review",
+            ...match,
+            confidence: images.length >= 2 ? 0.82 : 0.62,
           };
         }
         return {
-          category: "Pending broker verification",
-          brand: manual.brand || "Awaiting item details",
-          model: manual.model || "Awaiting upload",
+          category: "Unknown",
+          brand: manual.brand || "Unknown item category",
+          model: manual.model || "Unable to confidently identify item category",
+          confidence: images.length >= 2 ? 0.42 : 0.24,
         };
       }
 
@@ -898,11 +954,12 @@
 
       function getGuidedRequests() {
         const inferred = inferCategory(getAllAssets());
-        return guidedRequestsByCategory[inferred.category] || guidedRequestsByCategory.Watch;
+        return guidedRequestsByCategory[inferred.category] || guidedRequestsByCategory.Unknown;
       }
 
       function getEvidenceStatus() {
         const allAssets = getAllAssets();
+        const inferred = inferCategory(allAssets);
         const guidedRequests = getGuidedRequests();
         const checklistMap = getChecklistMap();
         const minimumRequired = Math.min(4, guidedRequests.length);
@@ -911,29 +968,42 @@
           guidedRequests,
           minimumRequired,
           completedRequired,
-          thresholdMet: completedRequired >= minimumRequired && allAssets.length >= minimumRequired,
+          thresholdMet:
+            inferred.category !== "Unknown" &&
+            inferred.category !== "Description required" &&
+            (inferred.confidence || 0) >= 0.55 &&
+            completedRequired >= minimumRequired &&
+            allAssets.length >= minimumRequired,
         };
       }
 
       function getPricingProfile(inferred, thresholdMet, checklistMap, manual) {
-        if (!thresholdMet) {
+        if (inferred.category === "Description required" || inferred.category === "Unknown" || !thresholdMet) {
           return {
             resale: "Locked until broker review",
             pawn: "Locked until broker review",
             resaleRisk: "orange",
             pawnRisk: "orange",
-            marketText: "Additional photos requested before pricing research begins",
+            marketText: inferred.category === "Description required"
+              ? "Add a short item description before pricing research begins"
+              : "Additional photos requested before pricing research begins",
             marketRisk: "orange",
             reviewText: "Pending broker verification",
             reviewRisk: "yellow",
-            verificationText: "Moderate confidence / more evidence needed",
-            verificationRisk: "yellow",
+            verificationText: inferred.category === "Description required"
+              ? "Description required before classification"
+              : inferred.category === "Unknown"
+                ? "Unable to confidently identify item category"
+                : "Moderate confidence / more evidence needed",
+            verificationRisk: inferred.category === "Description required" ? "orange" : "yellow",
           };
         }
 
         const hasSerial = checklistMap.has("serial") || Boolean(manual.serial);
         const hasDamage = checklistMap.has("damage");
-        const watchLike = inferred.category === "Watch" || manual.brand.toLowerCase().includes("rolex");
+        const watchLike =
+          inferred.category === "Watch" ||
+          /rolex|omega|tag|heuer|daytona|submariner/i.test(`${manual.brand} ${manual.description} ${manual.model}`);
 
         if (watchLike) {
           return hasSerial
@@ -958,7 +1028,7 @@
                 marketRisk: "yellow",
                 reviewText: "Model and serial review required",
                 reviewRisk: "orange",
-                verificationText: "Possible luxury watch / serial not confirmed",
+                verificationText: "Possible watch / serial not confirmed",
                 verificationRisk: "orange",
               };
         }
@@ -1104,12 +1174,20 @@
 
         document.getElementById("submission-status").textContent = !allAssets.length
           ? "Awaiting upload"
+          : inferred.category === "Description required"
+            ? "Description required"
+            : inferred.category === "Unknown"
+              ? "Additional photos requested"
           : evidenceStatus.thresholdMet
             ? "Ready for broker review"
             : "Additional photos requested";
 
         qualityMessage.textContent = !allAssets.length
           ? "Upload a clear first photo to begin the guided broker intake process."
+          : inferred.category === "Description required"
+            ? "Add one short item description before category detection begins."
+          : inferred.category === "Unknown"
+            ? "Unable to confidently identify the item category yet. Add clearer images and a short description."
           : failedRequired.length
             ? "Possible match recorded. Additional photos requested before broker review unlocks."
             : evidenceStatus.thresholdMet
@@ -1118,9 +1196,13 @@
 
         uploadCount.textContent = !allAssets.length
           ? "No photos uploaded yet"
+          : inferred.category === "Description required"
+            ? "Short description required"
           : `Possible match: ${inferred.category}`;
         uploadHint.textContent = !allAssets.length
           ? "Upload one clear photo to start guided evidence collection."
+          : inferred.category === "Description required"
+            ? "Add a short description like “Pokemon cards” or “Dell laptop” before category detection."
           : guidedRequests.length
             ? `Additional photos requested: ${guidedRequests.join(", ")}.`
             : "Pending broker verification.";
@@ -1136,7 +1218,9 @@
         const inferred = inferCategory(allAssets);
         const checklistMap = getChecklistMap();
         const manual = getManualSummary();
-        const watchLike = inferred.category === "Watch" || manual.brand.toLowerCase().includes("rolex");
+        const watchLike =
+          inferred.category === "Watch" ||
+          /rolex|omega|tag|heuer|daytona|submariner/i.test(`${manual.brand} ${manual.description} ${manual.model}`);
         const evidenceStatus = getEvidenceStatus();
         const additionalPhotos = evidenceStatus.guidedRequests
           .filter((request, index) => !checklistMap.has(request.key) && !(index === 0 && allAssets.length > 0))
@@ -1146,7 +1230,7 @@
         const condition = !thresholdMet
           ? "Pending broker verification"
           : watchLike
-            ? "Used luxury watch with visible wear check pending"
+            ? "Used watch with visible wear check pending"
             : checklistMap.has("damage")
               ? "Visible wear noted from uploaded close-ups"
               : "Condition review available from submitted photos";
@@ -1170,9 +1254,14 @@
           suggestedPawn: pricing.resale,
           suggestedBuy: pricing.pawn,
           pricing,
-          authenticity: watchLike
-            ? "Possible Rolex-style luxury watch / broker verification required"
-            : `Possible match: ${inferred.category}`,
+          authenticity:
+            inferred.category === "Description required"
+              ? "Add short item description before category review"
+              : inferred.category === "Unknown"
+                ? "Unable to confidently identify item category"
+                : watchLike
+                  ? "Possible watch / broker verification required"
+                  : `Possible match: ${inferred.category}`,
           noteSource: active.slot.label,
           serialStatus: checklistMap.has("serial") || manual.serial ? "Provided for broker verification" : "Additional serial / model photo requested",
           accessories: checklistMap.has("accessories")
@@ -1185,7 +1274,11 @@
           submissionStatus: thresholdMet ? "Ready for broker intake" : "Additional photos requested",
           activeNote: thresholdMet
             ? active.slot.note
-            : `Possible match: ${inferred.category}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Pending broker verification."}`,
+            : inferred.category === "Description required"
+              ? "Short item description required before category detection begins."
+              : inferred.category === "Unknown"
+                ? `Unable to confidently identify item category. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Add clearer images and labels."}`
+                : `Possible match: ${inferred.category}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Pending broker verification."}`,
           activeIssue: thresholdMet
             ? active.slot.issue
             : "Additional evidence is required before condition findings are shown.",
