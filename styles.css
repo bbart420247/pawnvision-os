@@ -67,14 +67,15 @@ main {
 }
 
 .topbar {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  width: 1350px;
+  gap: 16px;
+  width: 100%;
+  max-width: 1350px;
   min-height: 84px;
   margin-bottom: 12px;
-  padding: 8px 20px 8px 6px;
+  padding: 8px 56px 8px 18px;
   background:
     radial-gradient(circle at 10% 50%, rgba(200, 155, 60, 0.12), transparent 24%),
     linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0) 42%),
@@ -90,8 +91,8 @@ main {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  min-width: 640px;
-  max-width: 780px;
+  min-width: 400px;
+  max-width: 490px;
   height: 80px;
   padding: 0;
   overflow: visible;
@@ -116,9 +117,10 @@ main {
 .main-nav {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: center;
   gap: 24px;
   flex: 1 1 auto;
+  min-width: 0;
 }
 
 .main-nav a {
@@ -138,8 +140,10 @@ main {
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex: 0 0 auto;
+  gap: 10px;
+  flex: 0 1 auto;
+  justify-self: end;
+  padding-right: 0;
 }
 
 .account-cluster {
@@ -1180,6 +1184,85 @@ main {
 .support-card p,
 .user-pill small {
   color: var(--muted);
+}
+
+.value-card strong,
+.mini-stat strong,
+#condition-status,
+#detail-identified,
+#detail-brand,
+#detail-model,
+#detail-condition,
+#detail-category,
+#detail-angle,
+#issue-primary,
+#issue-primary-action,
+#issue-secondary,
+#issue-secondary-action,
+#market-research-note,
+#auth-status,
+#auth-confidence,
+#broker-review-flag,
+#summary-item-name,
+#summary-confidence,
+#summary-condition,
+#summary-market,
+#summary-review,
+#summary-pawn-range,
+#summary-buy-range,
+#summary-visible-issues,
+#summary-additional-photos,
+#summary-resale-category,
+#summary-submission-status,
+#summary-note-source,
+#summary-manual-check,
+#meta-brand-model,
+#meta-serial,
+#meta-accessories,
+#meta-condition,
+#meta-inventory,
+#active-shot-label,
+#active-shot-note,
+#auth-note {
+  color: var(--text);
+}
+
+#summary-confidence,
+#summary-visible-issues,
+#summary-additional-photos,
+#summary-resale-category,
+#summary-submission-status,
+#summary-note-source,
+#summary-manual-check,
+#active-shot-note,
+#auth-note,
+#market-research-note,
+#issue-primary,
+#issue-secondary {
+  color: #e7ebf0;
+}
+
+#detail-identified,
+#summary-item-name,
+#summary-pawn-range,
+#summary-buy-range,
+#summary-condition,
+#summary-market,
+#summary-review,
+#condition-status {
+  color: #f4f5f7;
+  font-weight: 700;
+}
+
+#summary-visible-issues,
+#summary-additional-photos,
+#issue-primary,
+#issue-primary-action,
+#issue-secondary,
+#issue-secondary-action,
+#market-research-note,
+#broker-review-flag {
+  font-weight: 600;
 }
 
 .upload-card small {
@@ -2340,6 +2423,7 @@ main {
 
 @media (max-width: 900px) {
   .topbar {
+    display: flex;
     width: 100%;
     height: auto;
     min-height: 84px;

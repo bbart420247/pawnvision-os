@@ -644,6 +644,178 @@
         ],
       };
 
+      const categoryCopy = {
+        Watch: {
+          typeLabel: "watch",
+          identified: "Possible luxury watch / broker verification required",
+          verificationPending: "Possible luxury watch / serial or reference confirmation pending",
+          reviewText: "Broker may adjust after inspection and reference verification",
+          conditionDefault: "Used watch with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded watch photos. Wear check still required.",
+          marketWithRef: "Preliminary watch estimate generated. Broker should confirm exact model and market comps.",
+          marketWithoutRef: "Preliminary watch estimate generated. Serial or reference photo still recommended.",
+          serialProvided: "Reference info provided / broker verification required",
+          serialMissing: "Serial or reference photo still requested",
+        },
+        Camera: {
+          typeLabel: "camera",
+          identified: "Possible vintage camera / broker verification required",
+          verificationPending: "Possible vintage camera / serial or model confirmation pending",
+          reviewText: "Broker may adjust after inspection and functional testing",
+          conditionDefault: "Vintage camera with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded camera photos. Lens and transport testing still required.",
+          marketWithRef: "Preliminary camera estimate generated. Broker should confirm exact model and mechanical condition.",
+          marketWithoutRef: "Preliminary camera estimate generated. Serial or model label still recommended.",
+          serialProvided: "Model or serial provided / broker verification required",
+          serialMissing: "Additional serial or model label photo requested",
+        },
+        Tool: {
+          typeLabel: "tool",
+          identified: "Possible professional tool / broker verification required",
+          verificationPending: "Possible professional tool / model confirmation pending",
+          reviewText: "Broker may adjust after inspection and power/function testing",
+          conditionDefault: "Used tool with wear check pending",
+          noDamageText: "No major damage visible from uploaded tool photos. Functional testing still required.",
+          marketWithRef: "Preliminary tool estimate generated. Broker should confirm exact model and battery/platform fit.",
+          marketWithoutRef: "Preliminary tool estimate generated. Model plate still recommended.",
+          serialProvided: "Model plate provided / broker verification required",
+          serialMissing: "Additional model or serial plate photo requested",
+        },
+        Console: {
+          typeLabel: "console",
+          identified: "Possible game console / broker verification required",
+          verificationPending: "Possible game console / serial confirmation pending",
+          reviewText: "Broker may adjust after inspection and boot/function testing",
+          conditionDefault: "Used console with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded console photos. Boot and accessory testing still required.",
+          marketWithRef: "Preliminary console estimate generated. Broker should confirm storage tier and included accessories.",
+          marketWithoutRef: "Preliminary console estimate generated. Serial label still recommended.",
+          serialProvided: "Serial provided / broker verification required",
+          serialMissing: "Additional serial or model sticker photo requested",
+        },
+        "Trading card": {
+          typeLabel: "trading card",
+          identified: "Possible trading card / broker verification required",
+          verificationPending: "Possible trading card / grade or slab confirmation pending",
+          reviewText: "Broker may adjust after inspection and grade verification",
+          conditionDefault: "Trading card with surface and edge review pending",
+          noDamageText: "No major card damage visible from uploaded photos. Edge and surface review still required.",
+          marketWithRef: "Preliminary card estimate generated. Broker should confirm grade, set, and liquidity.",
+          marketWithoutRef: "Preliminary card estimate generated. Front, back, and slab details still recommended.",
+          serialProvided: "Certification details provided / broker verification required",
+          serialMissing: "Additional slab, barcode, or identifying detail photo requested",
+        },
+        Jewelry: {
+          typeLabel: "jewelry item",
+          identified: "Possible jewelry item / broker verification required",
+          verificationPending: "Possible jewelry item / hallmark confirmation pending",
+          reviewText: "Broker may adjust after inspection and metal verification",
+          conditionDefault: "Jewelry item with wear check pending",
+          noDamageText: "No major damage visible from uploaded jewelry photos. Hallmark and clasp review still required.",
+          marketWithRef: "Preliminary jewelry estimate generated from photos and description.",
+          marketWithoutRef: "Preliminary jewelry estimate generated. Hallmark or clasp details still recommended.",
+          serialProvided: "Hallmark details provided / broker verification required",
+          serialMissing: "Additional hallmark or maker-mark photo requested",
+        },
+        Laptop: {
+          typeLabel: "laptop",
+          identified: "Possible laptop / broker verification required",
+          verificationPending: "Possible laptop / service tag confirmation pending",
+          reviewText: "Broker may adjust after inspection and boot testing",
+          conditionDefault: "Laptop with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded laptop photos. Screen and boot testing still required.",
+          marketWithRef: "Preliminary laptop estimate generated. Broker should confirm configuration and battery health.",
+          marketWithoutRef: "Preliminary laptop estimate generated. Service tag or bottom label still recommended.",
+          serialProvided: "Service tag provided / broker verification required",
+          serialMissing: "Additional service tag or model label photo requested",
+        },
+        Computer: {
+          typeLabel: "computer",
+          identified: "Possible computer / broker verification required",
+          verificationPending: "Possible computer / service tag confirmation pending",
+          reviewText: "Broker may adjust after inspection and power testing",
+          conditionDefault: "Computer with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded computer photos. Boot and spec verification still required.",
+          marketWithRef: "Preliminary computer estimate generated. Broker should confirm components and storage configuration.",
+          marketWithoutRef: "Preliminary computer estimate generated. Service tag or rear label still recommended.",
+          serialProvided: "Service tag provided / broker verification required",
+          serialMissing: "Additional service tag or model label photo requested",
+        },
+        Phone: {
+          typeLabel: "phone",
+          identified: "Possible phone / broker verification required",
+          verificationPending: "Possible phone / IMEI confirmation pending",
+          reviewText: "Broker may adjust after inspection and activation testing",
+          conditionDefault: "Phone with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded phone photos. IMEI and function testing still required.",
+          marketWithRef: "Preliminary phone estimate generated. Broker should confirm storage tier and carrier status.",
+          marketWithoutRef: "Preliminary phone estimate generated. IMEI or serial label still recommended.",
+          serialProvided: "IMEI provided / broker verification required",
+          serialMissing: "Additional IMEI or serial photo requested",
+        },
+        "Audio equipment": {
+          typeLabel: "audio equipment",
+          identified: "Possible audio equipment / broker verification required",
+          verificationPending: "Possible audio equipment / model confirmation pending",
+          reviewText: "Broker may adjust after inspection and audio testing",
+          conditionDefault: "Audio equipment with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded audio photos. Signal and speaker testing still required.",
+          marketWithRef: "Preliminary audio estimate generated. Broker should confirm model and function.",
+          marketWithoutRef: "Preliminary audio estimate generated. Rear label and model details still recommended.",
+          serialProvided: "Model details provided / broker verification required",
+          serialMissing: "Additional model or serial label photo requested",
+        },
+        Firearm: {
+          typeLabel: "firearm",
+          identified: "Possible firearm / broker verification required",
+          verificationPending: "Possible firearm / serial confirmation pending",
+          reviewText: "Broker may adjust after inspection and legal verification",
+          conditionDefault: "Firearm with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded firearm photos. Mechanical and legal review still required.",
+          marketWithRef: "Preliminary firearm estimate generated. Broker should confirm exact model and compliance status.",
+          marketWithoutRef: "Preliminary firearm estimate generated. Serial and manufacturer markings still recommended.",
+          serialProvided: "Serial provided / broker verification required",
+          serialMissing: "Additional serial or manufacturer-marking photo requested",
+        },
+        Collectible: {
+          typeLabel: "collectible",
+          identified: "Possible collectible / broker verification required",
+          verificationPending: "Possible collectible / maker-mark confirmation pending",
+          reviewText: "Broker may adjust after inspection and specialty verification",
+          conditionDefault: "Collectible with visible wear check pending",
+          noDamageText: "No major damage visible from uploaded collectible photos. Specialty review still required.",
+          marketWithRef: "Preliminary collectible estimate generated. Broker should confirm rarity and demand.",
+          marketWithoutRef: "Preliminary collectible estimate generated. Markings or certification details still recommended.",
+          serialProvided: "Supporting markings provided / broker verification required",
+          serialMissing: "Additional labels, markings, or certification photo requested",
+        },
+        Unknown: {
+          typeLabel: "item",
+          identified: "Possible item / broker verification required",
+          verificationPending: "Possible match only / more evidence needed",
+          reviewText: "Broker may adjust after inspection",
+          conditionDefault: "Visible condition pending clearer photos",
+          noDamageText: "No major damage visible from the current photo set.",
+          marketWithRef: "Preliminary estimate generated. Broker should confirm category and demand.",
+          marketWithoutRef: "Unable to confidently identify item category yet. Additional photos recommended.",
+          serialProvided: "Reference info provided / broker verification required",
+          serialMissing: "Additional serial, label, or maker-mark photo requested",
+        },
+      };
+
+      function getCategoryContext(inferred, manual, checklistMap) {
+        const watchLike =
+          inferred.category === "Watch" ||
+          /rolex|omega|tag|heuer|daytona|submariner/i.test(`${manual.brand} ${manual.description} ${manual.model}`);
+        const categoryKey = watchLike ? "Watch" : inferred.category in categoryCopy ? inferred.category : "Unknown";
+        return {
+          watchLike,
+          hasSerial: checklistMap.has("serial") || Boolean(manual.serial),
+          hasDamage: checklistMap.has("damage"),
+          copy: categoryCopy[categoryKey] || categoryCopy.Unknown,
+        };
+      }
+
       const fileInput = document.getElementById("file-input");
       const dropZone = document.getElementById("drop-zone");
       const viewerImage = document.getElementById("viewer-image");
@@ -1050,11 +1222,8 @@
           };
         }
 
-        const hasSerial = checklistMap.has("serial") || Boolean(manual.serial);
-        const hasDamage = checklistMap.has("damage");
-        const watchLike =
-          inferred.category === "Watch" ||
-          /rolex|omega|tag|heuer|daytona|submariner/i.test(`${manual.brand} ${manual.description} ${manual.model}`);
+        const context = getCategoryContext(inferred, manual, checklistMap);
+        const { hasSerial, hasDamage, watchLike, copy } = context;
 
         if (watchLike) {
           return hasSerial
@@ -1063,11 +1232,11 @@
                 pawn: "$180–$275",
                 resaleRisk: "green",
                 pawnRisk: hasDamage ? "orange" : "yellow",
-                marketText: "Preliminary resale estimate generated. Broker should confirm exact model.",
+                marketText: copy.marketWithRef,
                 marketRisk: "green",
-                reviewText: hasDamage ? "Condition risk check pending" : "Broker may adjust after inspection",
+                reviewText: hasDamage ? "Condition risk check pending" : copy.reviewText,
                 reviewRisk: hasDamage ? "orange" : "yellow",
-                verificationText: "Serial provided / broker verification required",
+                verificationText: copy.serialProvided,
                 verificationRisk: "yellow",
               }
             : {
@@ -1075,11 +1244,11 @@
                 pawn: "$150–$230",
                 resaleRisk: "yellow",
                 pawnRisk: "orange",
-                marketText: "Preliminary watch estimate generated. Serial or reference photo still recommended.",
+                marketText: copy.marketWithoutRef,
                 marketRisk: "yellow",
-                reviewText: "Broker may adjust after inspection",
+                reviewText: copy.reviewText,
                 reviewRisk: "orange",
-                verificationText: "Possible watch / serial not confirmed",
+                verificationText: copy.verificationPending,
                 verificationRisk: "orange",
               };
         }
@@ -1132,15 +1301,15 @@
           pawn: "$35–$75",
           resaleRisk: "orange",
           pawnRisk: "orange",
-          marketText: "Broker should verify resale demand and saturation manually",
+          marketText: copy.marketWithRef,
           marketRisk: "orange",
         };
 
         return {
           ...profile,
-          reviewText: hasDamage ? "Condition risk check pending" : "Broker may adjust after inspection",
+          reviewText: hasDamage ? "Condition risk check pending" : copy.reviewText,
           reviewRisk: hasDamage ? "orange" : "yellow",
-          verificationText: hasSerial ? "Reference info provided / broker verification required" : "Pending final broker approval",
+          verificationText: hasSerial ? copy.serialProvided : copy.verificationPending,
           verificationRisk: hasSerial ? "yellow" : "orange",
         };
       }
@@ -1269,9 +1438,8 @@
         const inferred = inferCategory(allAssets);
         const checklistMap = getChecklistMap();
         const manual = getManualSummary();
-        const watchLike =
-          inferred.category === "Watch" ||
-          /rolex|omega|tag|heuer|daytona|submariner/i.test(`${manual.brand} ${manual.description} ${manual.model}`);
+        const context = getCategoryContext(inferred, manual, checklistMap);
+        const { watchLike, hasSerial, copy } = context;
         const evidenceStatus = getEvidenceStatus();
         const additionalPhotos = evidenceStatus.guidedRequests
           .filter((request, index) => !checklistMap.has(request.key) && !(index === 0 && allAssets.length > 0))
@@ -1285,19 +1453,23 @@
               ? "Visible condition pending clearer photos"
               : "Used / visible wear"
           : watchLike
-            ? "Used watch with visible wear check pending"
+            ? copy.conditionDefault
             : checklistMap.has("damage")
               ? "Visible wear noted from uploaded close-ups"
-              : "Condition review available from submitted photos";
+              : inferred.category === "Camera"
+                ? "Camera body condition review available from submitted photos"
+                : "Condition review available from submitted photos";
         const visibleIssues = !thresholdMet
-          ? checklistMap.has("serial") || manual.serial
+          ? hasSerial
             ? "Initial image received. Preliminary estimate generated. Additional angles may improve accuracy."
             : `Initial image received. Preliminary estimate generated. ${additionalPhotos[0] ? `Need ${additionalPhotos[0].toLowerCase()}.` : "Need a close-up of model or serial details."}`
           : checklistMap.has("damage")
             ? "Visible wear noted from uploaded close-ups. Broker should confirm severity."
             : watchLike
-              ? "No major damage visible from uploaded watch photos. Wear check still required."
-              : "No major damage visible from the current photo set.";
+              ? copy.noDamageText
+              : inferred.category === "Camera"
+                ? copy.noDamageText
+                : "No major damage visible from the current photo set.";
 
         return {
           active,
@@ -1316,11 +1488,9 @@
               ? "Add short item description before category review"
               : inferred.category === "Unknown"
                 ? "Unable to confidently identify item category"
-                : watchLike
-                  ? "Possible watch / broker verification required"
-                  : `Possible match: ${inferred.category}`,
+                : copy.identified,
           noteSource: active.slot.label,
-          serialStatus: checklistMap.has("serial") || manual.serial ? "Provided for broker verification" : "Additional serial / model photo requested",
+          serialStatus: hasSerial ? copy.serialProvided : copy.serialMissing,
           accessories: checklistMap.has("accessories")
             ? "Supporting accessories uploaded"
             : manual.description
@@ -1335,7 +1505,7 @@
               ? "Short item description required before category detection begins."
             : inferred.category === "Unknown"
                 ? `Unable to confidently identify item category. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Add clearer images and labels."}`
-                : `Possible match: ${inferred.category}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Pending final broker approval."}`,
+                : `${copy.identified}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : copy.reviewText}.`,
           activeIssue: thresholdMet
             ? active.slot.issue
             : checklistMap.has("damage")
