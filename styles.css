@@ -1491,15 +1491,7 @@ main {
 }
 
 .viewer-note {
-  display: inline-flex;
-  align-items: center;
-  min-height: 26px;
-  max-width: 388px;
-  padding: 4px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.02);
-  font-size: 0.6rem;
+  display: none;
 }
 
 .image-intel {
@@ -1547,8 +1539,11 @@ main {
 
 .watch-display {
   position: relative;
-  height: 100%;
+  width: min(100%, 420px);
+  height: min(100%, 100%);
+  aspect-ratio: 4 / 5;
   min-height: 0;
+  max-height: 100%;
   border: 1px solid rgba(255, 255, 255, 0.05);
   background:
     radial-gradient(circle at 50% 78%, rgba(255, 255, 255, 0.08), transparent 25%),
@@ -1561,6 +1556,7 @@ main {
   border-radius: 10px;
   padding: 10px;
   cursor: grab;
+  justify-self: center;
 }
 
 .viewer-placeholder {
@@ -2079,7 +2075,7 @@ main {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 84px;
+  min-width: 108px;
   min-height: 46px;
   padding: 0 18px;
   border: 1px solid rgba(200, 155, 60, 0.45);
@@ -2316,7 +2312,7 @@ main {
   .floating-chat {
     right: 14px;
     bottom: 14px;
-    min-width: 74px;
+    min-width: 96px;
     min-height: 42px;
     padding: 0 16px;
   }
