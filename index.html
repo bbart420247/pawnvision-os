@@ -238,7 +238,7 @@
             <div class="value-card">
               <span>Identified item</span>
               <strong id="summary-item-name" class="empty-value">&nbsp;</strong>
-              <small id="summary-confidence">Pending broker verification</small>
+              <small id="summary-confidence">Preliminary estimate available after upload and description</small>
             </div>
 
             <div class="mini-stat-grid">
@@ -250,7 +250,7 @@
               <div class="mini-stat">
                 <span>Market research</span>
                 <strong id="summary-market" class="empty-value">&nbsp;</strong>
-                <small>Unlocks after minimum evidence</small>
+                <small>Pending final broker approval</small>
               </div>
               <div class="mini-stat">
                 <span>Broker review</span>
@@ -269,6 +269,7 @@
                 <span>Suggested pawn offer</span>
                 <strong id="summary-buy-range" class="empty-value">&nbsp;</strong>
               </div>
+              <p class="analysis-note">Preliminary estimate only. Final offer is at broker discretion after inspection.</p>
             </div>
 
             <div class="summary-block">
@@ -769,8 +770,8 @@
             <form class="item-details-form" id="item-details-form">
               <div class="form-grid">
                 <label class="form-field">
-                  <span>Short Item Description</span>
-                  <textarea name="description" rows="2" placeholder="Rolex watch with box&#10;PS5 console&#10;14k gold chain&#10;Milwaukee drill set&#10;Pokemon cards">${state.form.description}</textarea>
+                  <span>Briefly Describe Your Item</span>
+                  <textarea name="description" rows="2" placeholder="PS5 console&#10;Gold chain&#10;Milwaukee drill&#10;Pokemon cards&#10;Dell laptop&#10;Rolex watch">${state.form.description}</textarea>
                 </label>
                 <label class="form-field">
                   <span>Brand / Model (Optional)</span>
@@ -781,7 +782,7 @@
                   <input name="serial" type="text" value="${state.form.serial}" placeholder="Serial number" />
                 </label>
               </div>
-              <p class="analysis-note">Keep it simple. One short description plus optional brand or serial helps category detection start before broker review.</p>
+              <p class="analysis-note">Keep it simple. One short description plus optional brand or serial helps generate a preliminary estimate before broker review.</p>
               <div class="modal-helper-actions">
                 <button class="gold-button" type="submit">Save Description</button>
                 <button class="outline-button" id="clear-item-details-button" type="button">Clear Form</button>
@@ -945,24 +946,38 @@
       }
 
       function getPricingProfile(inferred, thresholdMet, checklistMap, manual) {
-        if (inferred.category === "Description required" || inferred.category === "Unknown" || !thresholdMet) {
+        const hasDescription = Boolean(manual.description);
+        const hasPhotos = getAllAssets().length > 0;
+
+        if (!hasPhotos || !hasDescription || inferred.category === "Description required") {
           return {
-            resale: "Locked until broker review",
-            pawn: "Locked until broker review",
+            resale: hasPhotos ? "Add description to estimate" : "Awaiting photo upload",
+            pawn: hasPhotos ? "Add description to estimate" : "Awaiting photo upload",
             resaleRisk: "orange",
             pawnRisk: "orange",
-            marketText: inferred.category === "Description required"
-              ? "Add a short item description before pricing research begins"
-              : "Additional photos requested before pricing research begins",
+            marketText: hasPhotos
+              ? "Add a brief item description before preliminary pricing runs"
+              : "Upload at least one clear item photo to begin preliminary pricing",
             marketRisk: "orange",
-            reviewText: "Pending broker verification",
+            reviewText: "Pending final broker approval",
             reviewRisk: "yellow",
-            verificationText: inferred.category === "Description required"
-              ? "Description required before classification"
-              : inferred.category === "Unknown"
-                ? "Unable to confidently identify item category"
-                : "Moderate confidence / more evidence needed",
-            verificationRisk: inferred.category === "Description required" ? "orange" : "yellow",
+            verificationText: "Description required before classification",
+            verificationRisk: "orange",
+          };
+        }
+
+        if (inferred.category === "Unknown") {
+          return {
+            resale: "$60–$140",
+            pawn: "$20–$55",
+            resaleRisk: "orange",
+            pawnRisk: "red",
+            marketText: "Unable to confidently identify item category yet. Additional photos recommended.",
+            marketRisk: "orange",
+            reviewText: "Pending final broker approval",
+            reviewRisk: "yellow",
+            verificationText: "Possible match only / more evidence needed",
+            verificationRisk: "orange",
           };
         }
 
@@ -979,9 +994,9 @@
                 pawn: "$180–$275",
                 resaleRisk: "green",
                 pawnRisk: hasDamage ? "orange" : "yellow",
-                marketText: "Strong resale category / broker should confirm exact model",
+                marketText: "Preliminary resale estimate generated. Broker should confirm exact model.",
                 marketRisk: "green",
-                reviewText: hasDamage ? "Condition risk check pending" : "Broker price review active",
+                reviewText: hasDamage ? "Condition risk check pending" : "Pending final broker approval",
                 reviewRisk: hasDamage ? "orange" : "yellow",
                 verificationText: "Serial provided / broker verification required",
                 verificationRisk: "yellow",
@@ -991,9 +1006,9 @@
                 pawn: "$150–$230",
                 resaleRisk: "yellow",
                 pawnRisk: "orange",
-                marketText: "Watch category recognized / serial still needed",
+                marketText: "Preliminary watch estimate generated. Serial or reference photo still recommended.",
                 marketRisk: "yellow",
-                reviewText: "Model and serial review required",
+                reviewText: "Pending final broker approval",
                 reviewRisk: "orange",
                 verificationText: "Possible watch / serial not confirmed",
                 verificationRisk: "orange",
@@ -1006,7 +1021,7 @@
             pawn: "$70–$135",
             resaleRisk: "yellow",
             pawnRisk: "yellow",
-            marketText: "Precious metal demand should be checked manually",
+            marketText: "Preliminary jewelry estimate generated from photos and description.",
             marketRisk: "yellow",
           },
           Tool: {
@@ -1014,7 +1029,7 @@
             pawn: "$45–$95",
             resaleRisk: "yellow",
             pawnRisk: "orange",
-            marketText: "Local tool demand and battery system should be confirmed",
+            marketText: "Preliminary tool estimate generated. Local demand and system compatibility should be confirmed.",
             marketRisk: "yellow",
           },
           Firearm: {
@@ -1022,7 +1037,7 @@
             pawn: "$100–$180",
             resaleRisk: "yellow",
             pawnRisk: "orange",
-            marketText: "Legal review and serial verification required",
+            marketText: "Preliminary firearm estimate generated. Legal review and serial verification still required.",
             marketRisk: "orange",
           },
           Console: {
@@ -1030,7 +1045,7 @@
             pawn: "$70–$120",
             resaleRisk: "yellow",
             pawnRisk: "orange",
-            marketText: "Generation, storage, and controller set should be confirmed",
+            marketText: "Preliminary console estimate generated. Generation and included accessories should be confirmed.",
             marketRisk: "yellow",
           },
           "Trading card": {
@@ -1038,7 +1053,7 @@
             pawn: "$20–$55",
             resaleRisk: "orange",
             pawnRisk: "red",
-            marketText: "Grading and liquidity vary heavily by card and slab",
+            marketText: "Preliminary card estimate generated. Grade and liquidity can change the final offer heavily.",
             marketRisk: "orange",
           },
         };
@@ -1054,9 +1069,9 @@
 
         return {
           ...profile,
-          reviewText: hasDamage ? "Condition risk check pending" : "Broker price review active",
+          reviewText: hasDamage ? "Condition risk check pending" : "Pending final broker approval",
           reviewRisk: hasDamage ? "orange" : "yellow",
-          verificationText: hasSerial ? "Reference info provided / broker verification required" : "Pending broker verification",
+          verificationText: hasSerial ? "Reference info provided / broker verification required" : "Pending final broker approval",
           verificationRisk: hasSerial ? "yellow" : "orange",
         };
       }
@@ -1156,10 +1171,10 @@
           : inferred.category === "Unknown"
             ? "Unable to confidently identify the item category yet. Add clearer images and a short description."
           : failedRequired.length
-            ? "Possible match recorded. Additional photos requested before broker review unlocks."
+            ? "Possible match recorded. Preliminary estimate available now. Additional photos requested for a stronger review."
             : evidenceStatus.thresholdMet
-              ? "Minimum evidence received. Broker review, condition analysis, and market research are now available."
-              : "Initial quality checks passed. Add the requested angles to unlock broker review.";
+              ? "Minimum evidence received. Preliminary estimate is active and broker review can move forward."
+              : "Initial quality checks passed. Preliminary estimate is active. Add requested angles to improve confidence.";
 
         uploadCount.textContent = !allAssets.length
           ? "No photos uploaded yet"
@@ -1172,7 +1187,7 @@
             ? "Add a short description like “Pokemon cards” or “Dell laptop” before category detection."
           : guidedRequests.length
             ? `Additional photos requested: ${guidedRequests.join(", ")}.`
-            : "Pending broker verification.";
+            : "Pending final broker approval.";
       }
 
       function getActiveImageAnalysis() {
@@ -1195,14 +1210,14 @@
         const thresholdMet = evidenceStatus.thresholdMet;
         const pricing = getPricingProfile(inferred, thresholdMet, checklistMap, manual);
         const condition = !thresholdMet
-          ? "Pending broker verification"
+          ? "Pending final broker approval"
           : watchLike
             ? "Used watch with visible wear check pending"
             : checklistMap.has("damage")
               ? "Visible wear noted from uploaded close-ups"
               : "Condition review available from submitted photos";
         const visibleIssues = !thresholdMet
-          ? "Initial image received. Additional angles requested before condition findings are shown."
+          ? "Initial image received. Preliminary estimate generated. Additional angles requested for stronger condition review."
           : checklistMap.has("damage")
             ? "Visible wear noted from uploaded close-ups. Broker should confirm severity."
             : watchLike
@@ -1214,7 +1229,7 @@
           inferred,
           thresholdMet,
           condition,
-          confidenceText: thresholdMet ? "Pending broker verification" : "Additional photos requested",
+          confidenceText: thresholdMet ? "Pending final broker approval" : "Preliminary estimate generated",
           visibleIssues,
           additionalPhotos,
           marketResearch: pricing.marketText,
@@ -1236,22 +1251,22 @@
             : manual.description
               ? `Customer note: ${manual.description}`
               : "Box / papers / accessories not provided yet",
-          inventoryControls: thresholdMet ? "Assign tag after final inspection" : "Inventory controls locked until review",
+          inventoryControls: thresholdMet ? "Assign tag after final inspection" : "Inventory controls available after broker review",
           reviewFlag: pricing.reviewText,
-          submissionStatus: thresholdMet ? "Ready for broker intake" : "Additional photos requested",
+          submissionStatus: thresholdMet ? "Ready for broker intake" : "Preliminary estimate ready / more photos requested",
           activeNote: thresholdMet
             ? active.slot.note
             : inferred.category === "Description required"
               ? "Short item description required before category detection begins."
-              : inferred.category === "Unknown"
+            : inferred.category === "Unknown"
                 ? `Unable to confidently identify item category. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Add clearer images and labels."}`
-                : `Possible match: ${inferred.category}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Pending broker verification."}`,
+                : `Possible match: ${inferred.category}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Pending final broker approval."}`,
           activeIssue: thresholdMet
             ? active.slot.issue
             : "Additional evidence is required before condition findings are shown.",
           activeAction: thresholdMet
             ? active.slot.action
-            : additionalPhotos[0] || "Pending broker verification",
+            : additionalPhotos[0] || "Pending final broker approval",
         };
       }
 
@@ -1279,7 +1294,7 @@
           document.getElementById("broker-review-flag").textContent = "\u00a0";
           document.getElementById("auth-note").textContent = "\u00a0";
           document.getElementById("summary-item-name").textContent = manual.description || "\u00a0";
-          document.getElementById("summary-confidence").textContent = "Pending broker verification";
+          document.getElementById("summary-confidence").textContent = "Awaiting upload and description";
           document.getElementById("summary-condition").textContent = "\u00a0";
           document.getElementById("summary-market").textContent = "\u00a0";
           document.getElementById("summary-review").textContent = "\u00a0";
@@ -1302,7 +1317,7 @@
             : "\u00a0";
           document.getElementById("meta-serial").textContent = manual.serial || "\u00a0";
           document.getElementById("meta-accessories").textContent = manual.description || "\u00a0";
-          document.getElementById("meta-condition").textContent = "Pending broker verification";
+          document.getElementById("meta-condition").textContent = "Pending final broker approval";
           document.getElementById("meta-inventory").textContent = "\u00a0";
           applyRiskClass(document.getElementById("summary-market"), "");
           applyRiskClass(document.getElementById("summary-review"), "");
@@ -1357,7 +1372,7 @@
 
         document.getElementById("summary-item-name").textContent = itemTitle;
         document.getElementById("summary-confidence").textContent = analysis.confidenceText;
-        document.getElementById("summary-condition").textContent = analysis.thresholdMet ? analysis.condition : "Pending broker verification";
+        document.getElementById("summary-condition").textContent = analysis.thresholdMet ? analysis.condition : "Pending final broker approval";
         document.getElementById("summary-market").textContent = analysis.marketResearch;
         document.getElementById("summary-review").textContent = analysis.reviewFlag;
         document.getElementById("summary-pawn-range").textContent = analysis.suggestedPawn;
@@ -1367,7 +1382,7 @@
           ? analysis.additionalPhotos.join(", ")
           : analysis.thresholdMet
             ? "No additional photo request"
-            : "Pending broker verification";
+            : "Pending final broker approval";
         document.getElementById("summary-resale-category").textContent = analysis.inferred.category;
         document.getElementById("summary-submission-status").textContent = submissionValue;
         document.getElementById("summary-note-source").textContent = noteSourceValue;
