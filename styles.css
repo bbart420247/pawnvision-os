@@ -90,8 +90,8 @@ main {
   display: flex;
   align-items: center;
   flex: 0 0 auto;
-  min-width: 560px;
-  max-width: 700px;
+  min-width: 640px;
+  max-width: 780px;
   height: 80px;
   padding: 0;
   overflow: visible;
@@ -106,7 +106,7 @@ main {
   max-height: 100%;
   object-fit: contain;
   object-position: left center;
-  transform: scale(2.7);
+  transform: scale(3.25);
   transform-origin: left center;
   filter:
     drop-shadow(0 12px 22px rgba(0, 0, 0, 0.24))
@@ -1073,14 +1073,16 @@ main {
 .left-rail {
   display: flex;
   width: 330px;
-  height: auto;
+  height: 100%;
+  align-self: stretch;
 }
 
 .center-rail {
   display: grid;
   grid-template-rows: minmax(550px, auto) minmax(210px, auto);
   width: 670px;
-  height: auto;
+  height: 100%;
+  align-self: stretch;
 }
 
 .panel {
@@ -1106,6 +1108,7 @@ main {
   flex-direction: column;
   min-height: 760px;
   height: 100%;
+  flex: 1 1 auto;
   overflow: visible;
 }
 
@@ -1353,6 +1356,60 @@ main {
   margin: 6px 0 0;
   color: var(--muted);
   font-size: 0.55rem;
+  line-height: 1.45;
+}
+
+.metals-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 0 2px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.metals-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.metal-card {
+  display: grid;
+  gap: 6px;
+  min-height: 72px;
+  padding: 10px 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0)),
+    rgba(255, 255, 255, 0.014);
+}
+
+.metal-card span {
+  color: var(--muted);
+  font-family: var(--heading-font);
+  font-size: 0.52rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.metal-card strong {
+  font-family: var(--heading-font);
+  font-size: 0.84rem;
+  letter-spacing: 0.03em;
+}
+
+.metal-gold strong {
+  color: var(--gold-bright);
+}
+
+.metal-silver strong {
+  color: #cdd4df;
+}
+
+.metals-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.54rem;
   line-height: 1.45;
 }
 
@@ -1920,6 +1977,7 @@ main {
   gap: 7px;
   min-height: 760px;
   height: 100%;
+  flex: 1 1 auto;
   align-self: stretch;
 }
 
@@ -2301,7 +2359,7 @@ main {
   .brand-logo {
     height: 100%;
     max-width: none;
-    transform: scale(1.75);
+    transform: scale(2.05);
     transform-origin: left center;
   }
 

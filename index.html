@@ -69,13 +69,13 @@
           <section class="dashboard" id="dashboard" aria-label="PawnVision dashboard demo">
             <div class="left-rail">
               <aside class="panel workflow-panel" id="workflow">
-                <label class="upload-card" for="file-input" id="drop-zone">
-                  <input id="file-input" class="visually-hidden" type="file" accept="image/*" multiple />
+                <input id="file-input" class="visually-hidden" type="file" accept="image/*" multiple />
+                <div class="upload-card" id="drop-zone" role="button" tabindex="0" aria-label="Upload photos">
                   <p id="upload-card-title">Upload the first clear item photo</p>
                   <p>or</p>
                   <button class="gold-button button-full upload-trigger" id="upload-trigger" type="button">Upload Photos</button>
                   <small id="upload-card-support">Supported: JPG, PNG</small>
-                </label>
+                </div>
 
                 <div class="upload-status" aria-live="polite">
                   <strong id="upload-count">No photos uploaded yet</strong>
@@ -88,7 +88,7 @@
                     <textarea
                       id="quick-description"
                       rows="2"
-                      placeholder="PS5 console&#10;Gold chain&#10;Pokemon cards&#10;Dell gaming laptop&#10;Milwaukee drill&#10;Rolex watch"
+                      placeholder=""
                     ></textarea>
                   </label>
                 </div>
@@ -104,6 +104,24 @@
                   <p class="quality-message" id="quality-message">
                     Upload a clear first photo to begin the guided broker intake process.
                   </p>
+                </div>
+
+                <div class="metals-panel" aria-live="polite">
+                  <div class="section-label section-label-tight">
+                    <span>Live metals</span>
+                    <span id="metals-updated">Updating...</span>
+                  </div>
+                  <div class="metals-grid">
+                    <div class="metal-card metal-gold">
+                      <span>Gold (XAU/oz)</span>
+                      <strong id="gold-price">--</strong>
+                    </div>
+                    <div class="metal-card metal-silver">
+                      <span>Silver (XAG/oz)</span>
+                      <strong id="silver-price">--</strong>
+                    </div>
+                  </div>
+                  <p class="metals-note" id="metals-note">Spot reference pricing updates automatically.</p>
                 </div>
 
 	                <ol class="step-list">
@@ -667,6 +685,10 @@
       const replaceSelectedButton = document.getElementById("replace-selected-button");
       const clearAllButton = document.getElementById("clear-all-button");
       const resetDemoButton = document.getElementById("reset-demo-button");
+      const goldPrice = document.getElementById("gold-price");
+      const silverPrice = document.getElementById("silver-price");
+      const metalsUpdated = document.getElementById("metals-updated");
+      const metalsNote = document.getElementById("metals-note");
 
       function showToast(message) {
         const toast = document.createElement("div");
@@ -678,6 +700,40 @@
           toast.classList.remove("is-visible");
           window.setTimeout(() => toast.remove(), 180);
         }, 2200);
+      }
+
+      async function updateMetalsPricing() {
+        const formatPrice = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 2,
+        });
+
+        try {
+          const [goldResponse, silverResponse] = await Promise.all([
+            fetch("https://api.gold-api.com/price/XAU"),
+            fetch("https://api.gold-api.com/price/XAG"),
+          ]);
+
+          if (!goldResponse.ok || !silverResponse.ok) {
+            throw new Error("Metals feed unavailable");
+          }
+
+          const [goldData, silverData] = await Promise.all([
+            goldResponse.json(),
+            silverResponse.json(),
+          ]);
+
+          goldPrice.textContent = formatPrice.format(goldData.price);
+          silverPrice.textContent = formatPrice.format(silverData.price);
+          metalsUpdated.textContent = goldData.updatedAtReadable || "Live";
+          metalsNote.textContent = "Spot reference pricing per troy ounce. Broker pricing may differ by purity, weight, and local market.";
+        } catch (error) {
+          goldPrice.textContent = "--";
+          silverPrice.textContent = "--";
+          metalsUpdated.textContent = "Feed offline";
+          metalsNote.textContent = "Live metals feed is temporarily unavailable.";
+        }
       }
 
       function openModal(title, content) {
@@ -1661,12 +1717,14 @@
         syncActiveAssets();
 
         if (!state.images.length) {
-          recentCaptures.innerHTML = `
-            <button class="capture-thumb placeholder-thumb is-selected" type="button" data-placeholder="upload"><span>1</span></button>
-            <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>2</span></button>
-            <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>3</span></button>
-            <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>4</span></button>
-          `;
+          if (recentCaptures) {
+            recentCaptures.innerHTML = `
+              <button class="capture-thumb placeholder-thumb is-selected" type="button" data-placeholder="upload"><span>1</span></button>
+              <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>2</span></button>
+              <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>3</span></button>
+              <button class="capture-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>4</span></button>
+            `;
+          }
           viewerThumbs.innerHTML = `
             <button class="angle-thumb placeholder-thumb is-selected" type="button" data-placeholder="upload"><span>A</span></button>
             <button class="angle-thumb placeholder-thumb" type="button" data-placeholder="upload"><span>B</span></button>
@@ -1688,10 +1746,12 @@
           return;
         }
 
-        recentCaptures.innerHTML = state.images
-          .slice(0, 4)
-          .map((item, index) => renderButtonImage(item, index, "capture-thumb"))
-          .join("");
+        if (recentCaptures) {
+          recentCaptures.innerHTML = state.images
+            .slice(0, 4)
+            .map((item, index) => renderButtonImage(item, index, "capture-thumb"))
+            .join("");
+        }
 
         viewerThumbs.innerHTML = state.images
           .slice(0, 5)
@@ -1784,8 +1844,25 @@
         loadFiles(event.dataTransfer.files);
       });
 
+      dropZone.addEventListener("click", (event) => {
+        if (event.target.closest(".upload-trigger")) {
+          return;
+        }
+        state.pendingReplace = false;
+        fileInput.click();
+      });
+
+      dropZone.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          state.pendingReplace = false;
+          fileInput.click();
+        }
+      });
+
       uploadTrigger.addEventListener("click", (event) => {
         event.preventDefault();
+        event.stopPropagation();
         state.pendingReplace = false;
         fileInput.click();
       });
@@ -2022,6 +2099,8 @@
       syncVisibleDescriptionField();
       updateItemDetailsStep();
       renderUploads();
+      updateMetalsPricing();
+      window.setInterval(updateMetalsPricing, 60000);
     </script>
   </body>
 </html>
