@@ -959,7 +959,7 @@
               ? "Add a brief item description before preliminary pricing runs"
               : "Upload at least one clear item photo to begin preliminary pricing",
             marketRisk: "orange",
-            reviewText: "Pending final broker approval",
+            reviewText: "Broker may adjust after inspection",
             reviewRisk: "yellow",
             verificationText: "Description required before classification",
             verificationRisk: "orange",
@@ -974,7 +974,7 @@
             pawnRisk: "red",
             marketText: "Unable to confidently identify item category yet. Additional photos recommended.",
             marketRisk: "orange",
-            reviewText: "Pending final broker approval",
+            reviewText: "Broker may adjust after inspection",
             reviewRisk: "yellow",
             verificationText: "Possible match only / more evidence needed",
             verificationRisk: "orange",
@@ -996,7 +996,7 @@
                 pawnRisk: hasDamage ? "orange" : "yellow",
                 marketText: "Preliminary resale estimate generated. Broker should confirm exact model.",
                 marketRisk: "green",
-                reviewText: hasDamage ? "Condition risk check pending" : "Pending final broker approval",
+                reviewText: hasDamage ? "Condition risk check pending" : "Broker may adjust after inspection",
                 reviewRisk: hasDamage ? "orange" : "yellow",
                 verificationText: "Serial provided / broker verification required",
                 verificationRisk: "yellow",
@@ -1008,7 +1008,7 @@
                 pawnRisk: "orange",
                 marketText: "Preliminary watch estimate generated. Serial or reference photo still recommended.",
                 marketRisk: "yellow",
-                reviewText: "Pending final broker approval",
+                reviewText: "Broker may adjust after inspection",
                 reviewRisk: "orange",
                 verificationText: "Possible watch / serial not confirmed",
                 verificationRisk: "orange",
@@ -1069,7 +1069,7 @@
 
         return {
           ...profile,
-          reviewText: hasDamage ? "Condition risk check pending" : "Pending final broker approval",
+          reviewText: hasDamage ? "Condition risk check pending" : "Broker may adjust after inspection",
           reviewRisk: hasDamage ? "orange" : "yellow",
           verificationText: hasSerial ? "Reference info provided / broker verification required" : "Pending final broker approval",
           verificationRisk: hasSerial ? "yellow" : "orange",
@@ -1210,14 +1210,20 @@
         const thresholdMet = evidenceStatus.thresholdMet;
         const pricing = getPricingProfile(inferred, thresholdMet, checklistMap, manual);
         const condition = !thresholdMet
-          ? "Pending final broker approval"
+          ? checklistMap.has("damage")
+            ? "Used / visible wear"
+            : inferred.category === "Unknown"
+              ? "Visible condition pending clearer photos"
+              : "Used / visible wear"
           : watchLike
             ? "Used watch with visible wear check pending"
             : checklistMap.has("damage")
               ? "Visible wear noted from uploaded close-ups"
               : "Condition review available from submitted photos";
         const visibleIssues = !thresholdMet
-          ? "Initial image received. Preliminary estimate generated. Additional angles requested for stronger condition review."
+          ? checklistMap.has("serial") || manual.serial
+            ? "Initial image received. Preliminary estimate generated. Additional angles may improve accuracy."
+            : `Initial image received. Preliminary estimate generated. ${additionalPhotos[0] ? `Need ${additionalPhotos[0].toLowerCase()}.` : "Need a close-up of model or serial details."}`
           : checklistMap.has("damage")
             ? "Visible wear noted from uploaded close-ups. Broker should confirm severity."
             : watchLike
@@ -1263,7 +1269,9 @@
                 : `Possible match: ${inferred.category}. ${additionalPhotos[0] ? `Next requested photo: ${additionalPhotos[0]}.` : "Pending final broker approval."}`,
           activeIssue: thresholdMet
             ? active.slot.issue
-            : "Additional evidence is required before condition findings are shown.",
+            : checklistMap.has("damage")
+              ? "Visible wear may be present. Additional close-ups can improve accuracy."
+              : "Photo set is limited. Condition estimate is preliminary.",
           activeAction: thresholdMet
             ? active.slot.action
             : additionalPhotos[0] || "Pending final broker approval",
@@ -1368,11 +1376,11 @@
         document.getElementById("broker-review-flag").textContent = analysis.reviewFlag;
         document.getElementById("auth-note").textContent = analysis.thresholdMet
           ? "Final authenticity and offer decisions require manual inspection."
-          : "Deeper review stays locked until the requested photo set is provided.";
+          : "AI preliminary estimate is active. Broker may adjust after inspection, and additional photos may improve accuracy.";
 
         document.getElementById("summary-item-name").textContent = itemTitle;
         document.getElementById("summary-confidence").textContent = analysis.confidenceText;
-        document.getElementById("summary-condition").textContent = analysis.thresholdMet ? analysis.condition : "Pending final broker approval";
+        document.getElementById("summary-condition").textContent = analysis.condition;
         document.getElementById("summary-market").textContent = analysis.marketResearch;
         document.getElementById("summary-review").textContent = analysis.reviewFlag;
         document.getElementById("summary-pawn-range").textContent = analysis.suggestedPawn;
