@@ -1286,6 +1286,14 @@
             marketText: "Preliminary console estimate generated. Generation and included accessories should be confirmed.",
             marketRisk: "yellow",
           },
+          Camera: {
+            resale: "$100–$180",
+            pawn: "$35–$75",
+            resaleRisk: "orange",
+            pawnRisk: "green",
+            marketText: "Preliminary camera estimate generated. Broker should confirm exact model and mechanical condition.",
+            marketRisk: "orange",
+          },
           "Trading card": {
             resale: "$60–$140",
             pawn: "$20–$55",
@@ -1320,6 +1328,127 @@
           return;
         }
         element.classList.add(`risk-${risk}`);
+      }
+
+      const readoutToneClasses = [
+        "readout-primary",
+        "readout-meta",
+        "readout-warning",
+        "readout-positive",
+      ];
+
+      function hasMeaningfulText(value) {
+        return String(value ?? "")
+          .replace(/\u00a0/g, "")
+          .trim().length > 0;
+      }
+
+      function setReadoutTone(id, tone = "", forceEmpty = false) {
+        const element = document.getElementById(id);
+        if (!element) {
+          return;
+        }
+        const hasText = hasMeaningfulText(element.textContent);
+        element.classList.remove(...readoutToneClasses);
+        element.classList.toggle("empty-value", forceEmpty || !hasText);
+        if (!forceEmpty && hasText && tone) {
+          element.classList.add(tone);
+        }
+      }
+
+      function syncReadoutVisuals(hasAnalysis) {
+        const allReadouts = [
+          "condition-status",
+          "detail-identified",
+          "detail-brand",
+          "detail-model",
+          "detail-condition",
+          "detail-category",
+          "detail-angle",
+          "issue-primary",
+          "issue-primary-action",
+          "issue-secondary",
+          "issue-secondary-action",
+          "market-research-note",
+          "auth-status",
+          "auth-confidence",
+          "broker-review-flag",
+          "auth-note",
+          "summary-item-name",
+          "summary-confidence",
+          "summary-condition",
+          "summary-market",
+          "summary-review",
+          "summary-pawn-range",
+          "summary-buy-range",
+          "summary-visible-issues",
+          "summary-additional-photos",
+          "summary-resale-category",
+          "summary-submission-status",
+          "summary-note-source",
+          "summary-manual-check",
+          "meta-brand-model",
+          "meta-serial",
+          "meta-accessories",
+          "meta-condition",
+          "meta-inventory",
+          "active-shot-label",
+          "active-shot-note",
+        ];
+
+        allReadouts.forEach((id) => setReadoutTone(id, "", !hasAnalysis && !hasMeaningfulText(document.getElementById(id)?.textContent)));
+
+        if (!hasAnalysis) {
+          return;
+        }
+
+        [
+          "condition-status",
+          "detail-identified",
+          "detail-brand",
+          "detail-model",
+          "detail-condition",
+          "detail-category",
+          "detail-angle",
+          "summary-item-name",
+          "summary-condition",
+          "summary-market",
+          "summary-review",
+          "summary-pawn-range",
+          "summary-resale-category",
+          "meta-brand-model",
+          "meta-condition",
+          "auth-confidence",
+          "broker-review-flag",
+          "issue-primary-action",
+          "issue-secondary-action",
+        ].forEach((id) => setReadoutTone(id, "readout-warning"));
+
+        [
+          "auth-status",
+          "summary-buy-range",
+          "summary-visible-issues",
+          "summary-submission-status",
+          "meta-serial",
+          "meta-inventory",
+        ].forEach((id) => setReadoutTone(id, "readout-positive"));
+
+        [
+          "summary-confidence",
+          "summary-additional-photos",
+          "summary-note-source",
+          "summary-manual-check",
+          "meta-accessories",
+          "issue-primary",
+          "issue-secondary",
+          "market-research-note",
+          "auth-note",
+          "active-shot-note",
+        ].forEach((id) => setReadoutTone(id, "readout-primary"));
+
+        [
+          "active-shot-label",
+        ].forEach((id) => setReadoutTone(id, "readout-primary"));
       }
 
       function getQualityChecks() {
@@ -1568,12 +1697,13 @@
           document.getElementById("meta-inventory").textContent = "\u00a0";
           applyRiskClass(document.getElementById("summary-market"), "");
           applyRiskClass(document.getElementById("summary-review"), "");
-          applyRiskClass(document.getElementById("summary-pawn-range"), "");
-          applyRiskClass(document.getElementById("summary-buy-range"), "");
-          applyRiskClass(document.getElementById("auth-confidence"), "");
-          applyRiskClass(document.getElementById("broker-review-flag"), "");
-          return;
-        }
+        applyRiskClass(document.getElementById("summary-pawn-range"), "");
+        applyRiskClass(document.getElementById("summary-buy-range"), "");
+        applyRiskClass(document.getElementById("auth-confidence"), "");
+        applyRiskClass(document.getElementById("broker-review-flag"), "");
+        syncReadoutVisuals(false);
+        return;
+      }
 
         const brandValue = manual.brand || analysis.inferred.brand;
         const modelValue = manual.model || analysis.inferred.model;
@@ -1645,6 +1775,7 @@
         applyRiskClass(document.getElementById("summary-buy-range"), analysis.pricing.pawnRisk);
         applyRiskClass(document.getElementById("auth-confidence"), analysis.pricing.verificationRisk);
         applyRiskClass(document.getElementById("broker-review-flag"), analysis.pricing.reviewRisk);
+        syncReadoutVisuals(true);
       }
 
       function revokeAssets(items) {

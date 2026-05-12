@@ -1997,6 +1997,26 @@ main {
   color: rgba(139, 147, 161, 0.35) !important;
 }
 
+.readout-primary {
+  color: #f4f5f7 !important;
+  opacity: 1 !important;
+}
+
+.readout-meta {
+  color: #e7ebf0 !important;
+  opacity: 1 !important;
+}
+
+.readout-warning {
+  color: var(--gold-bright) !important;
+  opacity: 1 !important;
+}
+
+.readout-positive {
+  color: var(--green) !important;
+  opacity: 1 !important;
+}
+
 .status-good,
 .auth-pill {
   margin: 0 0 8px;
