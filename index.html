@@ -1427,50 +1427,173 @@
           category: "Watch",
           keywords: ["rolex", "datejust", "submariner", "daytona", "yacht-master", "gmt-master", "126231", "126334", "126610"],
           verificationText: "Possible Rolex match / live luxury market verification required",
-          marketText: "High-value luxury watch detected. Verified sold comps and retail verification are required before pricing.",
-          reviewText: "Broker verification required before luxury pricing",
+          marketText: "Preliminary Rolex estimate generated. Broker should verify sold comps, exact reference, and bracelet/set completeness.",
+          reviewText: "Broker may adjust after inspection, authentication, and functional testing",
+          genericEstimate: {
+            resale: "$5,500–$8,500",
+            pawn: "$2,400–$4,200",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+          },
+          serialEstimate: {
+            resale: "$6,800–$9,800",
+            pawn: "$3,000–$4,800",
+            resaleRisk: "yellow",
+            pawnRisk: "yellow",
+          },
+          models: [
+            {
+              keywords: ["datejust", "126231"],
+              resale: "$8,000–$10,500",
+              pawn: "$3,500–$5,250",
+              marketText: "Preliminary Rolex Datejust estimate generated. Broker should verify sold comps, exact reference, and bracelet/set completeness.",
+            },
+            {
+              keywords: ["submariner", "126610"],
+              resale: "$9,000–$12,500",
+              pawn: "$4,000–$6,250",
+              marketText: "Preliminary Rolex Submariner estimate generated. Broker should verify sold comps, exact reference, and bracelet/set completeness.",
+            },
+          ],
         },
         {
           key: "Omega",
           category: "Watch",
           keywords: ["omega", "speedmaster", "seamaster", "constellation"],
           verificationText: "Possible Omega match / live luxury market verification required",
-          marketText: "High-value luxury watch detected. Verified sold comps are required before pricing.",
-          reviewText: "Broker verification required before luxury pricing",
+          marketText: "Preliminary Omega estimate generated. Broker should verify sold comps, exact model, and bracelet/set completeness.",
+          reviewText: "Broker may adjust after inspection, authentication, and functional testing",
+          genericEstimate: {
+            resale: "$2,800–$4,800",
+            pawn: "$1,100–$2,200",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+          },
+          serialEstimate: {
+            resale: "$3,400–$5,800",
+            pawn: "$1,400–$2,700",
+            resaleRisk: "yellow",
+            pawnRisk: "yellow",
+          },
         },
         {
           key: "Cartier",
           category: "Watch",
           keywords: ["cartier", "tank", "santos", "ballon bleu"],
           verificationText: "Possible Cartier match / live luxury market verification required",
-          marketText: "Luxury watch or jewelry detected. Verified market comps are required before pricing.",
-          reviewText: "Broker verification required before luxury pricing",
+          marketText: "Preliminary Cartier estimate generated. Broker should verify sold comps, exact model, and included accessories.",
+          reviewText: "Broker may adjust after inspection, authentication, and functional testing",
+          genericEstimate: {
+            resale: "$2,500–$6,500",
+            pawn: "$950–$2,800",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+          },
+          serialEstimate: {
+            resale: "$3,200–$7,800",
+            pawn: "$1,250–$3,400",
+            resaleRisk: "yellow",
+            pawnRisk: "yellow",
+          },
         },
         {
           key: "Audemars Piguet",
           category: "Watch",
           keywords: ["audemars piguet", "ap", "royal oak"],
           verificationText: "Possible Audemars Piguet match / live luxury market verification required",
-          marketText: "Ultra high-value watch detected. Verified sold comps are required before pricing.",
-          reviewText: "Senior broker verification required before luxury pricing",
+          marketText: "Preliminary AP estimate generated. Senior broker should verify sold comps, exact reference, and authentication evidence.",
+          reviewText: "Senior broker may adjust after inspection, authentication, and functional testing",
+          genericEstimate: {
+            resale: "$18,000–$32,000",
+            pawn: "$8,000–$15,000",
+            resaleRisk: "orange",
+            pawnRisk: "orange",
+          },
+          serialEstimate: {
+            resale: "$22,000–$38,000",
+            pawn: "$10,000–$18,000",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+          },
         },
         {
           key: "Patek Philippe",
           category: "Watch",
           keywords: ["patek", "philippe", "nautilus", "aquanaut"],
           verificationText: "Possible Patek Philippe match / live luxury market verification required",
-          marketText: "Ultra high-value watch detected. Verified sold comps are required before pricing.",
-          reviewText: "Senior broker verification required before luxury pricing",
+          marketText: "Preliminary Patek estimate generated. Senior broker should verify sold comps, exact reference, and authentication evidence.",
+          reviewText: "Senior broker may adjust after inspection, authentication, and functional testing",
+          genericEstimate: {
+            resale: "$20,000–$40,000",
+            pawn: "$9,000–$18,000",
+            resaleRisk: "orange",
+            pawnRisk: "orange",
+          },
+          serialEstimate: {
+            resale: "$24,000–$48,000",
+            pawn: "$11,000–$22,000",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+          },
         },
         {
           key: "Designer handbag",
           category: "Collectible",
           keywords: ["louis vuitton", "gucci", "hermes", "chanel", "prada", "ysl", "designer bag", "handbag"],
           verificationText: "Possible designer item / live luxury market verification required",
-          marketText: "High-value designer item detected. Verified sold comps are required before pricing.",
-          reviewText: "Broker verification required before luxury pricing",
+          marketText: "Preliminary designer item estimate generated. Broker should verify sold comps, exact style, and included accessories.",
+          reviewText: "Broker may adjust after inspection, authentication, and condition review",
+          genericEstimate: {
+            resale: "$1,200–$3,800",
+            pawn: "$450–$1,500",
+            resaleRisk: "yellow",
+            pawnRisk: "orange",
+          },
+          serialEstimate: {
+            resale: "$1,600–$4,800",
+            pawn: "$650–$2,000",
+            resaleRisk: "yellow",
+            pawnRisk: "yellow",
+          },
         },
       ];
+
+      function getLuxuryEstimate(profile, manual, inferred, hasSerial, hasDamage) {
+        const haystack = `${manual.brand} ${manual.model} ${manual.description} ${manual.serial} ${inferred.brand} ${inferred.model}`.toLowerCase();
+        const modelMatch = (profile.models || []).find((entry) => entry.keywords.every((keyword) => haystack.includes(keyword)));
+        const base = modelMatch
+          ? {
+              resale: modelMatch.resale,
+              pawn: modelMatch.pawn,
+              marketText: modelMatch.marketText || profile.marketText,
+              resaleRisk: hasSerial ? "yellow" : "orange",
+              pawnRisk: hasDamage ? "orange" : hasSerial ? "yellow" : "orange",
+            }
+          : hasSerial
+            ? {
+                ...profile.serialEstimate,
+                marketText: profile.marketText,
+              }
+            : {
+                ...profile.genericEstimate,
+                marketText: profile.marketText,
+              };
+
+        return {
+          resale: base.resale,
+          pawn: base.pawn,
+          resaleRisk: base.resaleRisk || "yellow",
+          pawnRisk: base.pawnRisk || "orange",
+          marketText: base.marketText || profile.marketText,
+          marketRisk: hasSerial ? "yellow" : "orange",
+          reviewText: profile.reviewText,
+          reviewRisk: hasDamage ? "orange" : "yellow",
+          verificationText: hasSerial
+            ? `${profile.key} / reference provided`
+            : profile.verificationText,
+          verificationRisk: hasSerial ? "yellow" : "orange",
+        };
+      }
 
       const marketSourceMap = {
         Watch: [
@@ -2219,20 +2342,7 @@
         const { hasSerial, hasDamage, watchLike, copy, luxuryFlow, luxuryProfile } = context;
 
         if (luxuryFlow) {
-          return {
-            resale: t("liveCompVerificationRequired"),
-            pawn: t("liveCompVerificationRequired"),
-            resaleRisk: "orange",
-            pawnRisk: "red",
-            marketText: luxuryProfile?.marketText || t("liveCompVerificationRequired"),
-            marketRisk: "orange",
-            reviewText: luxuryProfile?.reviewText || "Broker verification required before luxury pricing",
-            reviewRisk: "orange",
-            verificationText: hasSerial
-              ? `${luxuryProfile?.key || "Luxury item"} / reference provided`
-              : luxuryProfile?.verificationText || "Possible luxury item / live market verification required",
-            verificationRisk: hasSerial ? "yellow" : "orange",
-          };
+          return getLuxuryEstimate(luxuryProfile, manual, inferred, hasSerial, hasDamage);
         }
 
         if (watchLike) {
