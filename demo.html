@@ -2758,7 +2758,7 @@
           `${t("visibleIssues")}: ${translateOutput(report.visibleIssues)}`,
           `${t("additionalPhotos")}: ${report.additionalPhotos.length ? report.additionalPhotos.join(", ") : t("pendingFinalBrokerApproval")}`,
         ].join("\n");
-        return `mailto:?subject=${encodeURIComponent(`PawnVision OS ${report.ticketNumber}`)}&body=${encodeURIComponent(body)}`;
+        return `mailto:Brad@pawnvision-os.com?subject=${encodeURIComponent(`PawnVision OS ${report.ticketNumber}`)}&body=${encodeURIComponent(body)}`;
       }
 
       function openReportPrintView(report) {

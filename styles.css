@@ -584,6 +584,19 @@ main {
   font-size: 1.06rem;
 }
 
+.contact-direct-line,
+.request-demo-email {
+  margin-top: 14px;
+  color: #d8dde6;
+  font-size: 0.96rem;
+}
+
+.contact-direct-line a,
+.request-demo-email a {
+  color: var(--gold-bright);
+  text-decoration: underline;
+}
+
 .workflow-hero-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
