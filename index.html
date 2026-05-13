@@ -43,6 +43,11 @@
         </nav>
 
         <div class="topbar-actions">
+          <div class="language-switcher" aria-label="Language selector">
+            <button class="lang-button is-active" data-lang="en" type="button">EN</button>
+            <span class="lang-divider" aria-hidden="true">|</span>
+            <button class="lang-button" data-lang="es" type="button">ES</button>
+          </div>
           <div class="account-cluster">
             <button class="outline-button" id="login-button" type="button">Login</button>
             <button class="gold-button" id="create-account-button" type="button">Create Account</button>
@@ -69,13 +74,13 @@
           <section class="dashboard" id="dashboard" aria-label="PawnVision dashboard demo">
             <div class="left-rail">
               <aside class="panel workflow-panel" id="workflow">
-                <input id="file-input" class="visually-hidden" type="file" accept="image/*" multiple />
-                <div class="upload-card" id="drop-zone" role="button" tabindex="0" aria-label="Upload photos">
+                <label class="upload-card" id="drop-zone" for="file-input" role="button" tabindex="0" aria-label="Upload photos">
+                  <input id="file-input" class="upload-input-overlay" type="file" accept="image/*" multiple />
                   <p id="upload-card-title">Upload the first clear item photo</p>
-                  <p>or</p>
-                  <button class="gold-button button-full upload-trigger" id="upload-trigger" type="button">Upload Photos</button>
+                  <p id="upload-card-divider">or</p>
+                  <span class="gold-button button-full upload-trigger" id="upload-trigger">Upload Photos</span>
                   <small id="upload-card-support">Supported: JPG, PNG</small>
-                </div>
+                </label>
 
                 <div class="upload-status" aria-live="polite">
                   <strong id="upload-count">No photos uploaded yet</strong>
@@ -317,6 +322,22 @@
               </div>
             </div>
 
+              <div class="summary-block broker-inbox-block">
+                <div class="summary-block-header">
+                  <h3>Broker inbox</h3>
+                  <button class="outline-button compact-button" id="open-report-button" type="button">Open Report</button>
+                </div>
+                <div class="broker-inbox-list" id="broker-inbox-list">
+                  <div class="broker-inbox-empty">
+                    No broker reports generated yet. Upload photos and add a short description to create one.
+                  </div>
+                </div>
+                <div class="broker-report-actions">
+                  <button class="outline-button compact-button" id="email-report-button" type="button">Email Broker</button>
+                  <button class="outline-button compact-button" id="print-report-button" type="button">Print Report</button>
+                </div>
+              </div>
+
               <div class="summary-block">
                 <h3>Broker controls</h3>
                 <div class="broker-controls">
@@ -418,14 +439,611 @@
 	          role: "",
 	          name: "",
 	        },
-	        form: {
-	          description: "",
-	          brand: "",
-	          model: "",
-	          serial: "",
-	        },
+        form: {
+          description: "",
+          brand: "",
+          model: "",
+          serial: "",
+        },
+        reports: [],
+        currentReportId: "",
+        reportCounter: 978,
+        activeReportId: "",
 	        pendingReplace: false,
+        language: window.localStorage.getItem("pawnvision-language") === "es" ? "es" : "en",
       };
+
+      const translations = {
+        en: {
+          htmlLang: "en",
+          pawnVisionHome: "PawnVision home",
+          primaryNav: "Primary",
+          navHome: "Home",
+          navHow: "How It Works",
+          navCategories: "Categories",
+          navGuides: "Guides",
+          navFaq: "FAQ",
+          navAbout: "About Us",
+          navContact: "Contact",
+          login: "Login",
+          createAccount: "Create Account",
+          signedInAs: "Signed in as",
+          brokerWorkspace: "Broker workspace",
+          customerPortal: "Customer portal",
+          customerLogin: "Customer Login",
+          brokerLogin: "Broker Login",
+          logOut: "Log Out",
+          uploadCardTitle: "Upload the first clear item photo",
+          or: "or",
+          uploadPhotos: "Upload Photos",
+          supportedFiles: "Supported: JPG, PNG",
+          noPhotosUploaded: "No photos uploaded yet",
+          uploadHint: "Upload one clear photo to start guided evidence collection.",
+          description: "Description",
+          imageRequirements: "Image requirements",
+          awaitingUpload: "Awaiting upload",
+          liveMetals: "Live metals",
+          updating: "Updating...",
+          metalsAuto: "Spot reference pricing updates automatically.",
+          stepDescribe: "Describe item",
+          stepCondition: "Condition",
+          stepYourInfo: "Your info",
+          stepReview: "Review & submit",
+          viewerTitle: "360° Item Viewer",
+          fullScreen: "Full Screen",
+          awaitingAngles: "Awaiting uploaded angles",
+          guidedAngleNote: "Guided intake notes will update here when the broker selects an uploaded image.",
+          rotate: "Rotate",
+          zoom: "Zoom",
+          reset: "Reset",
+          tilt: "Tilt",
+          light: "Light",
+          removeSelected: "Remove Selected",
+          replaceSelected: "Replace Selected",
+          clearAll: "Clear All",
+          resetDemo: "Reset Demo",
+          analysisTitle: "AI condition analysis",
+          potentialIssues: "Potential issues",
+          authenticityCheck: "Authenticity check",
+          identifiedItem: "Identified item",
+          likelyBrand: "Likely brand",
+          likelyModel: "Likely model",
+          visibleCondition: "Visible condition",
+          resaleCategory: "Resale category",
+          selectedImage: "Selected image",
+          verificationStatus: "Verification status",
+          brokerReview: "Broker review",
+          intakeReviewSummary: "Intake review summary",
+          conditionEstimate: "Condition estimate",
+          visibleFromUploadedPhotos: "Visible from uploaded photos",
+          marketResearch: "Market research",
+          pendingFinalBrokerApproval: "Pending final broker approval",
+          manualInspectionRequired: "Manual inspection required",
+          internalRanges: "Internal ranges",
+          estimatedResale: "Estimated resale",
+          suggestedPawnOffer: "Suggested pawn offer",
+          preliminaryDisclaimer: "Preliminary estimate only. Final offer is at broker discretion after inspection.",
+          intakeWorkflowOutput: "Intake workflow output",
+          visibleIssues: "Visible issues",
+          additionalPhotos: "Additional photos",
+          submissionStatus: "Submission status",
+          aiNoteSource: "AI note source",
+          manualVerification: "Manual verification",
+          itemDetails: "Item details",
+          brandModel: "Brand / model",
+          serialModelPhoto: "Serial / model photo",
+          accessories: "Accessories",
+          conditionAI: "Condition (AI)",
+          inventoryControls: "Inventory controls",
+          brokerControls: "Broker controls",
+          assignTag: "Assign Tag",
+          printLabel: "Print Label",
+          ticketPrint: "Ticket Print",
+          aiLikelyDisclaimer: "AI outputs are likely findings based on uploaded photos. Final offer and authenticity decisions require broker review and in-person inspection.",
+          submitForInStoreReview: "Submit For In-Store Review",
+          footerDescription: "AI-powered pawn shop operating system for digital intake, broker review, and operational control.",
+          privacyPolicy: "Privacy Policy",
+          terms: "Terms",
+          accessibility: "Accessibility",
+          socialLinks: "Social Links",
+          poweredBy: "Powered by PawnVision OS",
+          liveChat: "Live Chat",
+          brokerInbox: "Broker inbox",
+          openReport: "Open Report",
+          emailBroker: "Email Broker",
+          printReport: "Print Report",
+          noBrokerReports: "No broker reports generated yet. Upload photos and add a short description to create one.",
+          ticketNumber: "Ticket number",
+          createdLabel: "Created",
+          customerNameLabel: "Customer name",
+          customerContactLabel: "Customer contact",
+          customerDescriptionLabel: "Customer description",
+          uploadedPhotosLabel: "Uploaded item photos",
+          aiCategoryDetection: "AI category detection",
+          aiVisibleCondition: "AI visible condition estimate",
+          confidenceClass: "Confidence class",
+          marketIntelligence: "Market intelligence",
+          verifiedMarketComps: "Verified market comps",
+          researchFallback: "Broker research links",
+          soldComps: "Sold comps",
+          activeListings: "Active listings",
+          retailSignals: "Retail / new price checks",
+          noReliableComp: "No reliable comp found from accessible source.",
+          sourceLabel: "Source",
+          searchQueryLabel: "Search query",
+          openSource: "Open source",
+          unavailablePrice: "Unavailable",
+          unavailableCondition: "Condition unavailable",
+          unavailableSeller: "Seller/source unavailable",
+          liveCompVerificationRequired: "Live market verification required before pricing.",
+          verifiedCompSourcePending: "Approved marketplace API or verified comp source not configured in this demo.",
+          reportTopSummary: "Broker intake report",
+          originalCustomerDescription: "Original customer description",
+          guestSubmission: "Guest submission",
+          customerAccountOnFile: "Customer account on file",
+          contactNotProvided: "Contact not provided",
+          confidenceHigh: "HIGH CONFIDENCE MATCH",
+          confidencePossible: "POSSIBLE MATCH",
+          confidenceLow: "LOW CONFIDENCE",
+          brokerActionsTitle: "Broker actions",
+          approveEstimate: "Approve estimate",
+          adjustOffer: "Adjust offer",
+          requestMorePhotosAction: "Request more photos",
+          rejectItemAction: "Reject item",
+          markInspection: "Mark for in-store inspection",
+          internalNotes: "Internal notes",
+          printTicketReport: "Print ticket / report",
+          reportUnavailable: "A broker report will appear after at least one photo and a short description are provided.",
+          reportEmailReady: "Broker email draft prepared.",
+          reportPrintReady: "Broker report print view prepared.",
+          brokerReportUpdated: "Broker intake report updated.",
+          accountAccess: "Account Access",
+          createYourAccount: "Create Your PawnVision OS Account",
+          customerLoginTitle: "Customer Login",
+          customerLoginBody: "Manage online submissions, upload item photos, and track review status.",
+          brokerLoginTitle: "Broker Login",
+          brokerLoginBody: "Open the broker workspace, AI review panels, and inventory controls.",
+          accountCreateHelp: "Create your account first, then choose whether you are entering as a customer or a broker.",
+          accountAccessHelp: "Choose the role that matches the workflow you need to access.",
+          createCustomerAccount: "Create Customer Account",
+          continueAsCustomer: "Continue as Customer",
+          continueAsDemo: "Continue as Demo",
+          describeYourItem: "Describe Your Item",
+          brieflyDescribeYourItem: "Briefly Describe Your Item",
+          brandModelOptional: "Brand / Model (Optional)",
+          serialNumberOptional: "Serial Number (Optional)",
+          keepItSimple: "Keep it simple. One short description plus optional brand or serial helps generate a preliminary estimate before broker review.",
+          saveDescription: "Save Description",
+          clearForm: "Clear Form",
+          privacyBody: "Customer submissions, uploaded photos, quote requests, and contact details should be processed securely and reviewed only for service, support, and operational workflow purposes.",
+          termsBody: "PawnVision OS workflows are for intake, documentation, and broker review. Final appraisal decisions, authenticity findings, and in-store offers require manual inspection and shop-specific compliance review.",
+          contactBody: "Need a real contact page? Use the public Contact template page to plug in store phone, email, address, and hours for each pawn shop deployment.",
+          accessibilityBody: "PawnVision OS should remain readable, keyboard accessible, and operational across desktop and mobile browsers while preserving the broker workflow layout.",
+          socialBody: "Add Facebook, Instagram, X, YouTube, or local marketplace links here when the live shop brand is ready.",
+          chatBody: "Demo support panel opened. In production, this can connect to messaging, SMS, Intercom-style chat, or a broker support queue.",
+          imageInspectionView: "Image Inspection View",
+          fullImageInspectionMode: "Full image inspection mode",
+          close: "Close",
+          closePanel: "Close panel",
+          ready: "Ready",
+          needsReview: "Needs review",
+          provided: "Provided",
+          additionalPhotoRequested: "Additional photo requested",
+          uploadFirstPhotoLabel: "Upload first photo",
+          uploadFirstPhotoHelp: "Start with one clear full-item image. Guided requests will appear after broad category recognition.",
+          goldLabel: "Gold (XAU/oz)",
+          silverLabel: "Silver (XAG/oz)",
+          feedOffline: "Feed offline",
+          metalsFeedOffline: "Live metals feed is temporarily unavailable.",
+          metalsSpotNote: "Spot reference pricing per troy ounce. Broker pricing may differ by purity, weight, and local market.",
+        },
+        es: {
+          htmlLang: "es",
+          pawnVisionHome: "Inicio de PawnVision",
+          primaryNav: "Navegación principal",
+          navHome: "Inicio",
+          navHow: "Cómo funciona",
+          navCategories: "Categorías",
+          navGuides: "Guías",
+          navFaq: "Preguntas",
+          navAbout: "Nosotros",
+          navContact: "Contacto",
+          login: "Iniciar sesión",
+          createAccount: "Crear cuenta",
+          signedInAs: "Sesión como",
+          brokerWorkspace: "Panel del corredor",
+          customerPortal: "Portal del cliente",
+          customerLogin: "Ingreso cliente",
+          brokerLogin: "Ingreso corredor",
+          logOut: "Cerrar sesión",
+          uploadCardTitle: "Sube la primera foto clara del artículo",
+          or: "o",
+          uploadPhotos: "Subir fotos",
+          supportedFiles: "Compatible: JPG, PNG",
+          noPhotosUploaded: "Todavía no hay fotos cargadas",
+          uploadHint: "Sube una foto clara para iniciar la recopilación guiada.",
+          description: "Descripción",
+          imageRequirements: "Requisitos de imagen",
+          awaitingUpload: "Esperando carga",
+          liveMetals: "Metales en vivo",
+          updating: "Actualizando...",
+          metalsAuto: "Los precios spot se actualizan automáticamente.",
+          stepDescribe: "Describir artículo",
+          stepCondition: "Condición",
+          stepYourInfo: "Tus datos",
+          stepReview: "Revisar y enviar",
+          viewerTitle: "Visor de artículo 360°",
+          fullScreen: "Pantalla completa",
+          awaitingAngles: "Esperando ángulos cargados",
+          guidedAngleNote: "Las notas guiadas de ingreso se actualizarán aquí cuando el corredor seleccione una imagen cargada.",
+          rotate: "Rotar",
+          zoom: "Zoom",
+          reset: "Reiniciar",
+          tilt: "Inclinar",
+          light: "Luz",
+          removeSelected: "Quitar seleccionada",
+          replaceSelected: "Reemplazar seleccionada",
+          clearAll: "Borrar todo",
+          resetDemo: "Reiniciar demo",
+          analysisTitle: "Análisis de condición IA",
+          potentialIssues: "Posibles problemas",
+          authenticityCheck: "Revisión de autenticidad",
+          identifiedItem: "Artículo identificado",
+          likelyBrand: "Marca probable",
+          likelyModel: "Modelo probable",
+          visibleCondition: "Condición visible",
+          resaleCategory: "Categoría de reventa",
+          selectedImage: "Imagen seleccionada",
+          verificationStatus: "Estado de verificación",
+          brokerReview: "Revisión del corredor",
+          intakeReviewSummary: "Resumen de ingreso",
+          conditionEstimate: "Estimación de condición",
+          visibleFromUploadedPhotos: "Visible en las fotos cargadas",
+          marketResearch: "Investigación de mercado",
+          pendingFinalBrokerApproval: "Pendiente de aprobación final del corredor",
+          manualInspectionRequired: "Inspección manual requerida",
+          internalRanges: "Rangos internos",
+          estimatedResale: "Reventa estimada",
+          suggestedPawnOffer: "Oferta de empeño sugerida",
+          preliminaryDisclaimer: "Estimación preliminar solamente. La oferta final queda a discreción del corredor después de la inspección.",
+          intakeWorkflowOutput: "Salida del flujo de ingreso",
+          visibleIssues: "Problemas visibles",
+          additionalPhotos: "Fotos adicionales",
+          submissionStatus: "Estado del envío",
+          aiNoteSource: "Origen de nota IA",
+          manualVerification: "Verificación manual",
+          itemDetails: "Detalles del artículo",
+          brandModel: "Marca / modelo",
+          serialModelPhoto: "Foto de serie / modelo",
+          accessories: "Accesorios",
+          conditionAI: "Condición (IA)",
+          inventoryControls: "Controles de inventario",
+          brokerControls: "Controles del corredor",
+          assignTag: "Asignar etiqueta",
+          printLabel: "Imprimir etiqueta",
+          ticketPrint: "Imprimir ticket",
+          aiLikelyDisclaimer: "Los resultados de IA son hallazgos probables basados en fotos cargadas. La oferta final y la autenticidad requieren revisión del corredor e inspección presencial.",
+          submitForInStoreReview: "Enviar para revisión en tienda",
+          footerDescription: "Sistema operativo de casa de empeño impulsado por IA para ingreso digital, revisión del corredor y control operativo.",
+          privacyPolicy: "Privacidad",
+          terms: "Términos",
+          accessibility: "Accesibilidad",
+          socialLinks: "Redes",
+          poweredBy: "Desarrollado por PawnVision OS",
+          liveChat: "Chat en vivo",
+          brokerInbox: "Bandeja del corredor",
+          openReport: "Abrir reporte",
+          emailBroker: "Enviar al corredor",
+          printReport: "Imprimir reporte",
+          noBrokerReports: "Todavía no hay reportes de ingreso. Sube fotos y agrega una descripción corta para crear uno.",
+          ticketNumber: "Número de ticket",
+          createdLabel: "Creado",
+          customerNameLabel: "Nombre del cliente",
+          customerContactLabel: "Contacto del cliente",
+          customerDescriptionLabel: "Descripción del cliente",
+          uploadedPhotosLabel: "Fotos cargadas del artículo",
+          aiCategoryDetection: "Detección de categoría IA",
+          aiVisibleCondition: "Estimación IA de condición visible",
+          confidenceClass: "Clasificación de confianza",
+          marketIntelligence: "Inteligencia de mercado",
+          verifiedMarketComps: "Comparables verificados",
+          researchFallback: "Enlaces de investigación del corredor",
+          soldComps: "Comparables vendidos",
+          activeListings: "Listados activos",
+          retailSignals: "Revisión retail / precio nuevo",
+          noReliableComp: "No se encontró un comparable confiable desde una fuente accesible.",
+          sourceLabel: "Fuente",
+          searchQueryLabel: "Búsqueda",
+          openSource: "Abrir fuente",
+          unavailablePrice: "No disponible",
+          unavailableCondition: "Condición no disponible",
+          unavailableSeller: "Vendedor/fuente no disponible",
+          liveCompVerificationRequired: "Se requiere verificación de mercado en vivo antes de fijar precio.",
+          verifiedCompSourcePending: "La API de marketplace aprobada o la fuente verificada de comparables no está configurada en esta demo.",
+          reportTopSummary: "Reporte de ingreso del corredor",
+          originalCustomerDescription: "Descripción original del cliente",
+          guestSubmission: "Envío como invitado",
+          customerAccountOnFile: "Cuenta de cliente registrada",
+          contactNotProvided: "Contacto no proporcionado",
+          confidenceHigh: "COINCIDENCIA DE ALTA CONFIANZA",
+          confidencePossible: "COINCIDENCIA POSIBLE",
+          confidenceLow: "BAJA CONFIANZA",
+          brokerActionsTitle: "Acciones del corredor",
+          approveEstimate: "Aprobar estimación",
+          adjustOffer: "Ajustar oferta",
+          requestMorePhotosAction: "Solicitar más fotos",
+          rejectItemAction: "Rechazar artículo",
+          markInspection: "Marcar para inspección en tienda",
+          internalNotes: "Notas internas",
+          printTicketReport: "Imprimir ticket / reporte",
+          reportUnavailable: "El reporte del corredor aparecerá después de cargar al menos una foto y una descripción corta.",
+          reportEmailReady: "Borrador de correo del corredor preparado.",
+          reportPrintReady: "Vista de impresión del reporte preparada.",
+          brokerReportUpdated: "Reporte de ingreso del corredor actualizado.",
+          accountAccess: "Acceso a la cuenta",
+          createYourAccount: "Crea tu cuenta de PawnVision OS",
+          customerLoginTitle: "Ingreso cliente",
+          customerLoginBody: "Gestiona envíos en línea, sube fotos de artículos y revisa el estado de evaluación.",
+          brokerLoginTitle: "Ingreso corredor",
+          brokerLoginBody: "Abre el espacio del corredor, paneles de IA y controles de inventario.",
+          accountCreateHelp: "Primero crea tu cuenta y luego elige si entras como cliente o corredor.",
+          accountAccessHelp: "Elige el rol que coincide con el flujo de trabajo que necesitas.",
+          createCustomerAccount: "Crear cuenta de cliente",
+          continueAsCustomer: "Continuar como cliente",
+          continueAsDemo: "Continuar como demo",
+          describeYourItem: "Describe tu artículo",
+          brieflyDescribeYourItem: "Describe brevemente tu artículo",
+          brandModelOptional: "Marca / modelo (opcional)",
+          serialNumberOptional: "Número de serie (opcional)",
+          keepItSimple: "Mantenlo simple. Una breve descripción más marca o serie opcional ayuda a generar una estimación preliminar antes de la revisión del corredor.",
+          saveDescription: "Guardar descripción",
+          clearForm: "Borrar formulario",
+          privacyBody: "Los envíos de clientes, fotos cargadas, solicitudes de cotización y datos de contacto deben procesarse de forma segura y revisarse solo para servicio, soporte y flujo operativo.",
+          termsBody: "Los flujos de PawnVision OS son para ingreso, documentación y revisión del corredor. Las decisiones finales de avalúo, autenticidad y ofertas en tienda requieren inspección manual y revisión de cumplimiento de cada tienda.",
+          contactBody: "¿Necesitas una página real de contacto? Usa la plantilla pública de Contacto para conectar teléfono, correo, dirección y horarios de cada tienda.",
+          accessibilityBody: "PawnVision OS debe seguir siendo legible, accesible por teclado y operativo en escritorio y móvil sin romper el flujo del corredor.",
+          socialBody: "Agrega aquí Facebook, Instagram, X, YouTube o enlaces de mercado local cuando la marca en vivo de la tienda esté lista.",
+          chatBody: "Panel de soporte demo abierto. En producción, esto puede conectarse a mensajería, SMS, chat tipo Intercom o una cola de soporte del corredor.",
+          imageInspectionView: "Vista de inspección de imagen",
+          fullImageInspectionMode: "Modo de inspección completa",
+          close: "Cerrar",
+          closePanel: "Cerrar panel",
+          ready: "Listo",
+          needsReview: "Revisar",
+          provided: "Cargado",
+          additionalPhotoRequested: "Foto adicional solicitada",
+          uploadFirstPhotoLabel: "Subir primera foto",
+          uploadFirstPhotoHelp: "Comienza con una imagen clara del artículo completo. Las solicitudes guiadas aparecerán después del reconocimiento general.",
+          goldLabel: "Oro (XAU/oz)",
+          silverLabel: "Plata (XAG/oz)",
+          feedOffline: "Sin conexión",
+          metalsFeedOffline: "El panel de metales en vivo no está disponible por el momento.",
+          metalsSpotNote: "Precio spot de referencia por onza troy. El precio del corredor puede variar según pureza, peso y mercado local.",
+        },
+      };
+
+      const categoryDisplayNames = {
+        en: {
+          Watch: "Watch",
+          "Trading card": "Trading card",
+          Jewelry: "Jewelry",
+          Tool: "Tool",
+          Firearm: "Firearm",
+          Console: "Console",
+          Laptop: "Laptop",
+          Computer: "Computer",
+          Phone: "Phone",
+          Camera: "Camera",
+          "Audio equipment": "Audio equipment",
+          Collectible: "Collectible",
+          Unknown: "Unknown item category",
+          "Description required": "Description required",
+        },
+        es: {
+          Watch: "Reloj",
+          "Trading card": "Tarjeta coleccionable",
+          Jewelry: "Joyería",
+          Tool: "Herramienta",
+          Firearm: "Arma de fuego",
+          Console: "Consola",
+          Laptop: "Laptop",
+          Computer: "Computadora",
+          Phone: "Teléfono",
+          Camera: "Cámara",
+          "Audio equipment": "Equipo de audio",
+          Collectible: "Coleccionable",
+          Unknown: "Categoría desconocida",
+          "Description required": "Descripción requerida",
+        },
+      };
+
+      const labelTranslations = {
+        es: {
+          "Front photo": "Foto frontal",
+          "Back photo": "Foto trasera",
+          "Side profile": "Perfil lateral",
+          "Clasp close-up": "Acercamiento del cierre",
+          "Crown close-up": "Acercamiento de la corona",
+          "Left side": "Lado izquierdo",
+          "Right side": "Lado derecho",
+          "Brand / serial close-up": "Acercamiento de marca / serie",
+          "Damage close-up": "Acercamiento del daño",
+          "Stamp / hallmark": "Sello / marca",
+          "Barcode / slab label": "Código de barras / etiqueta slab",
+          "Corner close-up": "Acercamiento de esquinas",
+          "Receipt / box / accessories": "Recibo / caja / accesorios",
+          "Front / dial photo": "Foto frontal / esfera",
+          "Clasp photo": "Foto del cierre",
+          "Serial / reference photo": "Foto de serie / referencia",
+          "Front of card": "Frente de la tarjeta",
+          "Back of card": "Parte trasera de la tarjeta",
+          "Slab barcode": "Código de barras del slab",
+          "Corners close-up": "Acercamiento de esquinas",
+          "Primary item photo": "Foto principal del artículo",
+          "Clasp close-up": "Acercamiento del cierre",
+          "Metal stamp / hallmark": "Sello de metal / marca",
+          "Full tool photo": "Foto completa de la herramienta",
+          "Model / serial plate": "Placa de modelo / serie",
+          "Wear / damage close-up": "Acercamiento de desgaste / daño",
+          "Full profile photo": "Foto de perfil completo",
+          "Opposite side profile": "Perfil del lado opuesto",
+          "Serial / markings": "Serie / marcas",
+          "Condition close-up": "Acercamiento de condición",
+          "Front view": "Vista frontal",
+          "Back / ports": "Parte trasera / puertos",
+          "Serial label": "Etiqueta de serie",
+          "Controller / cables": "Control / cables",
+          "Front / open view": "Vista frontal / abierta",
+          "Side ports": "Puertos laterales",
+          "Bottom label / serial": "Etiqueta inferior / serie",
+          "Screen or case wear": "Desgaste de pantalla o carcasa",
+          "Rear ports": "Puertos traseros",
+          "Serial / service tag": "Serie / etiqueta de servicio",
+          "Side panel": "Panel lateral",
+          "Screen photo": "Foto de la pantalla",
+          "Back photo": "Foto trasera",
+          "IMEI / serial label": "IMEI / etiqueta de serie",
+          "Front / lens view": "Vista frontal / lente",
+          "Body wear close-up": "Acercamiento del desgaste del cuerpo",
+          "Rear inputs / outputs": "Entradas / salidas traseras",
+          "Model / serial label": "Etiqueta de modelo / serie",
+          "Primary front view": "Vista frontal principal",
+          "Back view": "Vista trasera",
+          "Markings / labels": "Marcas / etiquetas",
+          "Primary front view": "Vista frontal principal",
+          "Back / reverse side": "Lado trasero / reverso",
+          "Label / serial / markings": "Etiqueta / serie / marcas",
+        },
+      };
+
+      const outputTranslations = {
+        es: {
+          "Upload a clear first photo to begin the guided broker intake process.": "Sube una primera foto clara para iniciar el proceso guiado del corredor.",
+          "Add one short item description before category detection begins.": "Agrega una descripción corta antes de iniciar la detección de categoría.",
+          "Unable to confidently identify the item category yet. Add clearer images and a short description.": "Aún no se puede identificar con confianza la categoría del artículo. Agrega imágenes más claras y una descripción corta.",
+          "Possible match recorded. Preliminary estimate available now. Additional photos requested for a stronger review.": "Se registró una coincidencia posible. La estimación preliminar ya está disponible. Se solicitan más fotos para una revisión más sólida.",
+          "Minimum evidence received. Preliminary estimate is active and broker review can move forward.": "Se recibió la evidencia mínima. La estimación preliminar está activa y la revisión del corredor puede avanzar.",
+          "Initial quality checks passed. Preliminary estimate is active. Add requested angles to improve confidence.": "Se aprobaron las revisiones iniciales. La estimación preliminar está activa. Agrega los ángulos solicitados para mejorar la confianza.",
+          "Description required before classification": "Descripción requerida antes de clasificar",
+          "Add a brief item description before preliminary pricing runs": "Agrega una breve descripción antes de calcular el precio preliminar",
+          "Upload at least one clear item photo to begin preliminary pricing": "Sube al menos una foto clara del artículo para iniciar el precio preliminar",
+          "Unable to confidently identify item category yet. Additional photos recommended.": "Aún no se puede identificar con confianza la categoría del artículo. Se recomiendan fotos adicionales.",
+          "Possible match only / more evidence needed": "Solo coincidencia posible / se necesita más evidencia",
+          "Broker may adjust after inspection": "El corredor puede ajustar después de la inspección",
+          "Awaiting photo upload": "Esperando carga de foto",
+          "Add description to estimate": "Agrega descripción para estimar",
+          "Possible item / broker verification required": "Posible artículo / verificación del corredor requerida",
+          "Visible condition pending clearer photos": "Condición visible pendiente de fotos más claras",
+          "Reference info provided / broker verification required": "Información de referencia proporcionada / verificación del corredor requerida",
+          "Additional serial, label, or maker-mark photo requested": "Se solicita foto adicional de serie, etiqueta o marca",
+          "No major damage visible from the current photo set.": "No se observan daños importantes en el conjunto actual de fotos.",
+          "Preliminary estimate generated. Broker should confirm category and demand.": "Se generó una estimación preliminar. El corredor debe confirmar la categoría y la demanda.",
+          "Upload a file to begin the guided intake workflow.": "Sube un archivo para comenzar el flujo guiado de ingreso.",
+          "Please upload JPG or PNG image files.": "Por favor sube archivos de imagen JPG o PNG.",
+          "There is no uploaded media to remove.": "No hay archivos cargados para quitar.",
+          "Selected media removed.": "Se quitó el archivo seleccionado.",
+          "All uploaded media cleared.": "Se borraron todos los archivos cargados.",
+          "Demo reset to blank dashboard state.": "La demo se reinició al estado vacío del panel.",
+          "Upload an image first to open inspection mode.": "Primero sube una imagen para abrir el modo de inspección.",
+          "Viewer rotated.": "Visor rotado.",
+          "Zoom enabled. Drag to inspect fine details.": "Zoom activado. Arrastra para inspeccionar detalles finos.",
+          "Zoom reset.": "Zoom reiniciado.",
+          "Viewer reset.": "Visor reiniciado.",
+          "Tilt view enabled.": "Vista inclinada activada.",
+          "Tilt view cleared.": "Vista inclinada desactivada.",
+          "Lighting assist enabled.": "Asistencia de iluminación activada.",
+          "Lighting assist disabled.": "Asistencia de iluminación desactivada.",
+          "Photo intake mode is active.": "El modo de ingreso por foto está activo.",
+          "Upload item media first to move through image angles.": "Primero sube imágenes del artículo para recorrer los ángulos.",
+          "Rotate is ready once item media has been uploaded.": "Rotar estará disponible una vez que se carguen las imágenes.",
+          "Zoom is ready once item media has been uploaded.": "Zoom estará disponible una vez que se carguen las imágenes.",
+          "Tilt is ready once item media has been uploaded.": "La inclinación estará disponible una vez que se carguen las imágenes.",
+          "Lighting review is ready once item media has been uploaded.": "La revisión de luz estará disponible una vez que se carguen las imágenes.",
+          "Continuing in demo mode. The public homepage remains fully available.": "Continuando en modo demo. La página pública sigue totalmente disponible.",
+          "Role switch": "Cambio de rol",
+          "You have been logged out.": "Se cerró tu sesión.",
+          "Item details cleared.": "Se borraron los detalles del artículo.",
+          "Quick item details saved and linked to broker output.": "Los detalles rápidos se guardaron y se vincularon con la salida del corredor.",
+          "Inventory tag assignment opened.": "Se abrió la asignación de etiqueta de inventario.",
+          "Label print queue prepared.": "La cola de impresión de etiquetas está preparada.",
+          "Ticket print workflow prepared.": "El flujo de impresión de tickets está preparado.",
+          "Submission queued for broker intake and final in-person inspection.": "El envío quedó en cola para ingreso del corredor e inspección final en tienda.",
+          "Upload item media before submitting for in-store review.": "Sube imágenes del artículo antes de enviarlo para revisión en tienda.",
+          "Live metals feed is temporarily unavailable.": "El panel de metales en vivo no está disponible por el momento.",
+          "Spot reference pricing per troy ounce. Broker pricing may differ by purity, weight, and local market.": "Precio spot de referencia por onza troy. El precio del corredor puede variar según pureza, peso y mercado local.",
+        },
+      };
+
+      function t(key) {
+        return translations[state.language]?.[key] ?? translations.en[key] ?? key;
+      }
+
+      function translateCategoryName(value) {
+        return categoryDisplayNames[state.language]?.[value] ?? value;
+      }
+
+      function translateLabel(value) {
+        return labelTranslations[state.language]?.[value] ?? value;
+      }
+
+      function translateOutput(value) {
+        if (state.language === "en" || value == null) {
+          return value;
+        }
+
+        const text = String(value);
+        const exact = outputTranslations.es[text];
+        if (exact) {
+          return exact;
+        }
+
+        if (text.startsWith("Possible match: ")) {
+          return `Coincidencia posible: ${translateCategoryName(text.replace("Possible match: ", ""))}`;
+        }
+
+        if (text.startsWith("Additional photos requested: ")) {
+          const labels = text.replace("Additional photos requested: ", "").replace(/\.$/, "").split(", ").map(translateLabel);
+          return `Fotos adicionales solicitadas: ${labels.join(", ")}.`;
+        }
+
+        if (text.startsWith("Additional photo recommended: ")) {
+          return `Foto adicional recomendada: ${translateLabel(text.replace("Additional photo recommended: ", ""))}`;
+        }
+
+        if (text.startsWith("Next requested photo: ")) {
+          return `Siguiente foto solicitada: ${translateLabel(text.replace("Next requested photo: ", "").replace(/\.$/, ""))}.`;
+        }
+
+        if (text.startsWith("Customer note: ")) {
+          return `Nota del cliente: ${text.replace("Customer note: ", "")}`;
+        }
+
+        if (text.includes(" + Quick item details")) {
+          return `${translateOutput(text.replace(" + Quick item details", ""))} + Detalles rápidos`;
+        }
+
+        if (text.includes(" • Item details complete")) {
+          return `${translateOutput(text.replace(" • Item details complete", ""))} • Detalles completos`;
+        }
+
+        return text
+          .replaceAll("Awaiting upload", t("awaitingUpload"))
+          .replaceAll("Pending final broker approval", t("pendingFinalBrokerApproval"))
+          .replaceAll("Ready for broker review", "Listo para revisión del corredor")
+          .replaceAll("Camera", translateCategoryName("Camera"))
+          .replaceAll("Watch", translateCategoryName("Watch"))
+          .replaceAll("Jewelry", translateCategoryName("Jewelry"))
+          .replaceAll("Tool", translateCategoryName("Tool"))
+          .replaceAll("Console", translateCategoryName("Console"))
+          .replaceAll("Trading card", translateCategoryName("Trading card"))
+          .replaceAll("Laptop", translateCategoryName("Laptop"))
+          .replaceAll("Computer", translateCategoryName("Computer"))
+          .replaceAll("Phone", translateCategoryName("Phone"))
+          .replaceAll("Audio equipment", translateCategoryName("Audio equipment"))
+          .replaceAll("Collectible", translateCategoryName("Collectible"))
+          .replaceAll("Unknown item category", translateCategoryName("Unknown"))
+          .replaceAll("Description required", translateCategoryName("Description required"));
+      }
 
       const slotBlueprint = [
         {
@@ -803,13 +1421,212 @@
         },
       };
 
+      const luxuryProfiles = [
+        {
+          key: "Rolex",
+          category: "Watch",
+          keywords: ["rolex", "datejust", "submariner", "daytona", "yacht-master", "gmt-master", "126231", "126334", "126610"],
+          verificationText: "Possible Rolex match / live luxury market verification required",
+          marketText: "High-value luxury watch detected. Verified sold comps and retail verification are required before pricing.",
+          reviewText: "Broker verification required before luxury pricing",
+        },
+        {
+          key: "Omega",
+          category: "Watch",
+          keywords: ["omega", "speedmaster", "seamaster", "constellation"],
+          verificationText: "Possible Omega match / live luxury market verification required",
+          marketText: "High-value luxury watch detected. Verified sold comps are required before pricing.",
+          reviewText: "Broker verification required before luxury pricing",
+        },
+        {
+          key: "Cartier",
+          category: "Watch",
+          keywords: ["cartier", "tank", "santos", "ballon bleu"],
+          verificationText: "Possible Cartier match / live luxury market verification required",
+          marketText: "Luxury watch or jewelry detected. Verified market comps are required before pricing.",
+          reviewText: "Broker verification required before luxury pricing",
+        },
+        {
+          key: "Audemars Piguet",
+          category: "Watch",
+          keywords: ["audemars piguet", "ap", "royal oak"],
+          verificationText: "Possible Audemars Piguet match / live luxury market verification required",
+          marketText: "Ultra high-value watch detected. Verified sold comps are required before pricing.",
+          reviewText: "Senior broker verification required before luxury pricing",
+        },
+        {
+          key: "Patek Philippe",
+          category: "Watch",
+          keywords: ["patek", "philippe", "nautilus", "aquanaut"],
+          verificationText: "Possible Patek Philippe match / live luxury market verification required",
+          marketText: "Ultra high-value watch detected. Verified sold comps are required before pricing.",
+          reviewText: "Senior broker verification required before luxury pricing",
+        },
+        {
+          key: "Designer handbag",
+          category: "Collectible",
+          keywords: ["louis vuitton", "gucci", "hermes", "chanel", "prada", "ysl", "designer bag", "handbag"],
+          verificationText: "Possible designer item / live luxury market verification required",
+          marketText: "High-value designer item detected. Verified sold comps are required before pricing.",
+          reviewText: "Broker verification required before luxury pricing",
+        },
+      ];
+
+      const marketSourceMap = {
+        Watch: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "google-shopping", section: "retail" },
+          { key: "google-search", section: "active" },
+        ],
+        Camera: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "google-shopping", section: "retail" },
+          { key: "amazon", section: "retail" },
+          { key: "google-search", section: "active" },
+        ],
+        Tool: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "amazon", section: "retail" },
+          { key: "walmart", section: "retail" },
+          { key: "google-shopping", section: "retail" },
+        ],
+        Console: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "best-buy", section: "retail" },
+          { key: "walmart", section: "retail" },
+          { key: "amazon", section: "retail" },
+        ],
+        Laptop: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "best-buy", section: "retail" },
+          { key: "amazon", section: "retail" },
+          { key: "google-shopping", section: "retail" },
+        ],
+        Computer: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "best-buy", section: "retail" },
+          { key: "amazon", section: "retail" },
+          { key: "google-shopping", section: "retail" },
+        ],
+        Phone: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "best-buy", section: "retail" },
+          { key: "amazon", section: "retail" },
+          { key: "google-shopping", section: "retail" },
+        ],
+        Jewelry: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "google-shopping", section: "retail" },
+          { key: "google-search", section: "active" },
+        ],
+        "Trading card": [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "facebook", section: "active" },
+          { key: "google-search", section: "active" },
+        ],
+        "Audio equipment": [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "reverb", section: "active" },
+          { key: "google-shopping", section: "retail" },
+          { key: "amazon", section: "retail" },
+        ],
+        Collectible: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "chairish", section: "active" },
+          { key: "facebook", section: "active" },
+          { key: "google-search", section: "active" },
+        ],
+        Unknown: [
+          { key: "ebay-sold", section: "sold" },
+          { key: "ebay-active", section: "active" },
+          { key: "google-search", section: "active" },
+          { key: "google-shopping", section: "retail" },
+        ],
+      };
+
+      const marketSourceMeta = {
+        "ebay-sold": { label: "eBay sold", type: "sold" },
+        "ebay-active": { label: "eBay active", type: "active" },
+        "google-shopping": { label: "Google Shopping", type: "retail" },
+        "google-search": { label: "Google search", type: "active" },
+        amazon: { label: "Amazon", type: "retail" },
+        "best-buy": { label: "Best Buy", type: "retail" },
+        walmart: { label: "Walmart", type: "retail" },
+        reverb: { label: "Reverb", type: "active" },
+        chairish: { label: "Chairish", type: "active" },
+        facebook: { label: "Facebook Marketplace", type: "active" },
+      };
+
+      function getSearchUrl(sourceKey, query) {
+        const encoded = encodeURIComponent(query);
+        switch (sourceKey) {
+          case "ebay-sold":
+            return `https://www.ebay.com/sch/i.html?_nkw=${encoded}&LH_Sold=1&LH_Complete=1`;
+          case "ebay-active":
+            return `https://www.ebay.com/sch/i.html?_nkw=${encoded}`;
+          case "google-shopping":
+            return `https://www.google.com/search?tbm=shop&q=${encoded}`;
+          case "google-search":
+            return `https://www.google.com/search?q=${encoded}`;
+          case "amazon":
+            return `https://www.amazon.com/s?k=${encoded}`;
+          case "best-buy":
+            return `https://www.bestbuy.com/site/searchpage.jsp?st=${encoded}`;
+          case "walmart":
+            return `https://www.walmart.com/search?q=${encoded}`;
+          case "reverb":
+            return `https://reverb.com/marketplace?query=${encoded}`;
+          case "chairish":
+            return `https://www.chairish.com/search?q=${encoded}`;
+          case "facebook":
+            return `https://www.facebook.com/marketplace/search/?query=${encoded}`;
+          default:
+            return `https://www.google.com/search?q=${encoded}`;
+        }
+      }
+
+      function isModernCategory(category) {
+        return ["Console", "Laptop", "Computer", "Phone", "Tool", "Audio equipment"].includes(category);
+      }
+
+      function getCurrentTimestamp() {
+        return new Intl.DateTimeFormat(state.language === "es" ? "es-MX" : "en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        }).format(new Date());
+      }
+
+      function formatTicketNumber(value) {
+        return `#${String(value).padStart(7, "0")}`;
+      }
+
+      function detectLuxuryProfile(inferred, manual) {
+        const haystack = `${manual.brand} ${manual.model} ${manual.description} ${manual.serial} ${inferred.brand} ${inferred.model}`.toLowerCase();
+        return luxuryProfiles.find((profile) => profile.keywords.some((keyword) => haystack.includes(keyword))) || null;
+      }
+
       function getCategoryContext(inferred, manual, checklistMap) {
-        const watchLike =
-          inferred.category === "Watch" ||
-          /rolex|omega|tag|heuer|daytona|submariner/i.test(`${manual.brand} ${manual.description} ${manual.model}`);
-        const categoryKey = watchLike ? "Watch" : inferred.category in categoryCopy ? inferred.category : "Unknown";
+        const luxuryProfile = detectLuxuryProfile(inferred, manual);
+        const watchLike = inferred.category === "Watch" || luxuryProfile?.category === "Watch";
+        const categoryKey = inferred.category in categoryCopy ? inferred.category : watchLike ? "Watch" : "Unknown";
         return {
           watchLike,
+          luxuryProfile,
+          luxuryFlow: Boolean(luxuryProfile),
           hasSerial: checklistMap.has("serial") || Boolean(manual.serial),
           hasDamage: checklistMap.has("damage"),
           copy: categoryCopy[categoryKey] || categoryCopy.Unknown,
@@ -861,11 +1678,17 @@
       const silverPrice = document.getElementById("silver-price");
       const metalsUpdated = document.getElementById("metals-updated");
       const metalsNote = document.getElementById("metals-note");
+      const languageButtons = document.querySelectorAll("[data-lang]");
+      const brokerInboxList = document.getElementById("broker-inbox-list");
+      const openReportButton = document.getElementById("open-report-button");
+      const emailReportButton = document.getElementById("email-report-button");
+      const printReportButton = document.getElementById("print-report-button");
+      const appModalCard = document.querySelector(".app-modal-card");
 
       function showToast(message) {
         const toast = document.createElement("div");
         toast.className = "toast";
-        toast.textContent = message;
+        toast.textContent = translateOutput(message);
         toastStack.appendChild(toast);
         requestAnimationFrame(() => toast.classList.add("is-visible"));
         window.setTimeout(() => {
@@ -899,29 +1722,43 @@
           goldPrice.textContent = formatPrice.format(goldData.price);
           silverPrice.textContent = formatPrice.format(silverData.price);
           metalsUpdated.textContent = goldData.updatedAtReadable || "Live";
-          metalsNote.textContent = "Spot reference pricing per troy ounce. Broker pricing may differ by purity, weight, and local market.";
+          metalsNote.textContent = t("metalsSpotNote");
         } catch (error) {
           goldPrice.textContent = "--";
           silverPrice.textContent = "--";
-          metalsUpdated.textContent = "Feed offline";
-          metalsNote.textContent = "Live metals feed is temporarily unavailable.";
+          metalsUpdated.textContent = t("feedOffline");
+          metalsNote.textContent = t("metalsFeedOffline");
         }
       }
 
-      function openModal(title, content) {
+      function openModal(title, content, variant = "default") {
         modalTitle.textContent = title;
         modalBody.innerHTML = content;
+        appModalCard.classList.toggle("is-report-modal", variant === "report");
         appModal.classList.remove("is-hidden");
         appModal.setAttribute("aria-hidden", "false");
       }
 
       function closeModal() {
+        appModalCard.classList.remove("is-report-modal");
         appModal.classList.add("is-hidden");
         appModal.setAttribute("aria-hidden", "true");
       }
 
       function getAllAssets() {
         return Object.values(state.library).flat();
+      }
+
+      function triggerFilePicker() {
+        if (typeof fileInput.showPicker === "function") {
+          try {
+            fileInput.showPicker();
+            return;
+          } catch (error) {
+            // Fallback to click when showPicker is blocked by the browser.
+          }
+        }
+        fileInput.click();
       }
 
       function syncActiveAssets() {
@@ -939,7 +1776,9 @@
           const initial = state.auth.name ? state.auth.name.charAt(0).toUpperCase() : "A";
           userAvatar.textContent = initial;
           userName.textContent = state.auth.name;
-          userContext.textContent = state.auth.role === "broker" ? "Broker workspace" : "Customer portal";
+          userContext.textContent = state.auth.role === "broker" ? t("brokerWorkspace") : t("customerPortal");
+        } else {
+          userContext.textContent = t("signedInAs");
         }
       }
 
@@ -962,6 +1801,160 @@
         }
       }
 
+      function applyTranslations() {
+        document.documentElement.lang = t("htmlLang");
+        document.querySelector(".brand")?.setAttribute("aria-label", t("pawnVisionHome"));
+        document.querySelector(".main-nav")?.setAttribute("aria-label", t("primaryNav"));
+        const navLinks = document.querySelectorAll(".main-nav a");
+        if (navLinks[0]) navLinks[0].textContent = t("navHome");
+        if (navLinks[1]) navLinks[1].textContent = t("navHow");
+        if (navLinks[2]) navLinks[2].textContent = t("navCategories");
+        if (navLinks[3]) navLinks[3].textContent = t("navGuides");
+        if (navLinks[4]) navLinks[4].textContent = t("navFaq");
+        if (navLinks[5]) navLinks[5].textContent = t("navAbout");
+        if (navLinks[6]) navLinks[6].textContent = t("navContact");
+
+        loginButton.textContent = t("login");
+        createAccountButton.textContent = t("createAccount");
+
+        const accountOptions = document.querySelectorAll(".account-option");
+        if (accountOptions[0]) accountOptions[0].textContent = t("customerLogin");
+        if (accountOptions[1]) accountOptions[1].textContent = t("brokerLogin");
+        if (accountOptions[2]) accountOptions[2].textContent = t("logOut");
+
+        uploadCardTitle.textContent = t("uploadCardTitle");
+        document.getElementById("upload-card-divider").textContent = t("or");
+        uploadTrigger.textContent = t("uploadPhotos");
+        uploadCardSupport.textContent = t("supportedFiles");
+        document.querySelector(".quick-description-block .form-field > span").textContent = t("description");
+        document.querySelector(".quality-review .section-label span:first-child").textContent = t("imageRequirements");
+        document.querySelector(".metals-panel .section-label span:first-child").textContent = t("liveMetals");
+        document.querySelector(".metal-gold span").textContent = t("goldLabel");
+        document.querySelector(".metal-silver span").textContent = t("silverLabel");
+        document.querySelector("#item-details-button").innerHTML = `<span>2.</span> ${t("stepDescribe")}`;
+        document.querySelector(".step-list li:nth-child(2)").innerHTML = `<span>3.</span> ${t("stepCondition")}`;
+        document.querySelector(".step-list li:nth-child(3)").innerHTML = `<span>4.</span> ${t("stepYourInfo")}`;
+        document.querySelector(".step-list li:nth-child(4)").innerHTML = `<span>5.</span> ${t("stepReview")}`;
+
+        document.querySelector(".viewer-panel .panel-heading h2").textContent = t("viewerTitle");
+        openImage.textContent = t("fullScreen");
+        document.getElementById("rotate-tool").textContent = t("rotate");
+        document.getElementById("zoom-tool").textContent = t("zoom");
+        document.getElementById("reset-tool").textContent = t("reset");
+        document.getElementById("tilt-tool").textContent = t("tilt");
+        document.getElementById("light-tool").textContent = t("light");
+        removeSelectedButton.textContent = t("removeSelected");
+        replaceSelectedButton.textContent = t("replaceSelected");
+        clearAllButton.textContent = t("clearAll");
+        resetDemoButton.textContent = t("resetDemo");
+
+        const analysisTitles = document.querySelectorAll(".analysis-card h3");
+        if (analysisTitles[0]) analysisTitles[0].textContent = t("analysisTitle");
+        if (analysisTitles[1]) analysisTitles[1].textContent = t("potentialIssues");
+        if (analysisTitles[2]) analysisTitles[2].textContent = t("authenticityCheck");
+        const detailLabels = document.querySelectorAll(".analysis-card .detail-list li span");
+        if (detailLabels[0]) detailLabels[0].textContent = t("identifiedItem");
+        if (detailLabels[1]) detailLabels[1].textContent = t("likelyBrand");
+        if (detailLabels[2]) detailLabels[2].textContent = t("likelyModel");
+        if (detailLabels[3]) detailLabels[3].textContent = t("visibleCondition");
+        if (detailLabels[4]) detailLabels[4].textContent = t("resaleCategory");
+        if (detailLabels[5]) detailLabels[5].textContent = t("selectedImage");
+        const confidenceRows = document.querySelectorAll(".confidence-row span");
+        if (confidenceRows[0]) confidenceRows[0].textContent = t("verificationStatus");
+        if (confidenceRows[1]) confidenceRows[1].textContent = t("brokerReview");
+
+        document.querySelector(".summary-panel .panel-heading h2").textContent = t("intakeReviewSummary");
+        document.querySelector(".value-card > span").textContent = t("identifiedItem");
+        const miniStats = document.querySelectorAll(".mini-stat");
+        if (miniStats[0]) {
+          miniStats[0].querySelector("span").textContent = t("conditionEstimate");
+          miniStats[0].querySelector("small").textContent = t("visibleFromUploadedPhotos");
+        }
+        if (miniStats[1]) {
+          miniStats[1].querySelector("span").textContent = t("marketResearch");
+          miniStats[1].querySelector("small").textContent = t("pendingFinalBrokerApproval");
+        }
+        if (miniStats[2]) {
+          miniStats[2].querySelector("span").textContent = t("brokerReview");
+          miniStats[2].querySelector("small").textContent = t("manualInspectionRequired");
+        }
+
+        const summaryBlocks = document.querySelectorAll(".summary-block h3");
+        if (summaryBlocks[0]) summaryBlocks[0].textContent = t("internalRanges");
+        if (summaryBlocks[1]) summaryBlocks[1].textContent = t("intakeWorkflowOutput");
+        if (summaryBlocks[2]) summaryBlocks[2].textContent = t("itemDetails");
+        if (summaryBlocks[3]) summaryBlocks[3].textContent = t("brokerInbox");
+        if (summaryBlocks[4]) summaryBlocks[4].textContent = t("brokerControls");
+        const internalRows = document.querySelectorAll(".summary-block:nth-of-type(1) .summary-row span");
+        if (internalRows[0]) internalRows[0].textContent = t("estimatedResale");
+        if (internalRows[1]) internalRows[1].textContent = t("suggestedPawnOffer");
+        const intakeRows = document.querySelectorAll(".summary-block:nth-of-type(2) .summary-row span");
+        if (intakeRows[0]) intakeRows[0].textContent = t("visibleIssues");
+        if (intakeRows[1]) intakeRows[1].textContent = t("additionalPhotos");
+        if (intakeRows[2]) intakeRows[2].textContent = t("resaleCategory");
+        if (intakeRows[3]) intakeRows[3].textContent = t("submissionStatus");
+        if (intakeRows[4]) intakeRows[4].textContent = t("aiNoteSource");
+        if (intakeRows[5]) intakeRows[5].textContent = t("manualVerification");
+        const metaLabels = document.querySelectorAll(".meta-grid span");
+        if (metaLabels[0]) metaLabels[0].textContent = t("brandModel");
+        if (metaLabels[1]) metaLabels[1].textContent = t("serialModelPhoto");
+        if (metaLabels[2]) metaLabels[2].textContent = t("accessories");
+        if (metaLabels[3]) metaLabels[3].textContent = t("conditionAI");
+        if (metaLabels[4]) metaLabels[4].textContent = t("inventoryControls");
+        const inboxButtons = document.querySelectorAll(".broker-report-actions button");
+        if (document.getElementById("open-report-button")) document.getElementById("open-report-button").textContent = t("openReport");
+        if (inboxButtons[0]) inboxButtons[0].textContent = t("emailBroker");
+        if (inboxButtons[1]) inboxButtons[1].textContent = t("printReport");
+        const inboxEmpty = document.querySelector(".broker-inbox-empty");
+        if (inboxEmpty && !state.reports.length) inboxEmpty.textContent = t("noBrokerReports");
+        const brokerButtons = document.querySelectorAll(".broker-controls button");
+        if (brokerButtons[0]) brokerButtons[0].textContent = t("assignTag");
+        if (brokerButtons[1]) brokerButtons[1].textContent = t("printLabel");
+        if (brokerButtons[2]) brokerButtons[2].textContent = t("ticketPrint");
+        document.querySelector(".summary-panel .disclaimer").textContent = t("aiLikelyDisclaimer");
+        document.getElementById("submit-review").textContent = t("submitForInStoreReview");
+
+        document.querySelector(".app-footer-top strong").textContent = "PawnVision OS";
+        document.querySelector(".app-footer-top p").textContent = t("footerDescription");
+        const footerLinks = document.querySelectorAll(".footer-link");
+        if (footerLinks[0]) footerLinks[0].textContent = t("privacyPolicy");
+        if (footerLinks[1]) footerLinks[1].textContent = t("terms");
+        if (footerLinks[2]) footerLinks[2].textContent = t("navContact");
+        if (footerLinks[3]) footerLinks[3].textContent = t("accessibility");
+        if (footerLinks[4]) footerLinks[4].textContent = t("socialLinks");
+        const footerBits = document.querySelectorAll(".app-footer-bottom span");
+        if (footerBits[0]) footerBits[0].textContent = state.language === "es" ? "© 2026 PawnVision OS. Todos los derechos reservados." : "© 2026 PawnVision OS. All rights reserved.";
+        if (footerBits[1]) footerBits[1].textContent = t("poweredBy");
+        document.querySelector(".floating-chat").textContent = t("liveChat");
+        document.getElementById("close-modal").setAttribute("aria-label", t("closePanel"));
+        document.getElementById("inspector-title").textContent = t("imageInspectionView");
+        if (!getActiveMediaItem()) {
+          inspectorMeta.textContent = t("fullImageInspectionMode");
+        }
+        document.getElementById("close-inspector-button").textContent = t("close");
+        languageButtons.forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.lang === state.language);
+        });
+      }
+
+      function setLanguage(language) {
+        state.language = language === "es" ? "es" : "en";
+        window.localStorage.setItem("pawnvision-language", state.language);
+        applyTranslations();
+        updateAuthUI();
+        updateModeUI();
+        updateCustomerChecklist();
+        updateQualityReview();
+        updateBrokerPanels();
+        updateMetalsPricing();
+        if (!appModal.classList.contains("is-hidden") && appModalCard.classList.contains("is-report-modal")) {
+          const activeReport = getActiveBrokerReport();
+          if (activeReport) {
+            openBrokerReport(activeReport.id);
+          }
+        }
+      }
+
       function setAuth(role, flow) {
         if (role === "demo") {
           closeModal();
@@ -977,27 +1970,27 @@
       }
 
       function openAuthModal(defaultFlow = "login") {
-        const title = defaultFlow === "register" ? "Create Your PawnVision OS Account" : "Account Access";
+        const title = defaultFlow === "register" ? t("createYourAccount") : t("accountAccess");
         openModal(
           title,
           `
             <div class="modal-option-grid">
               <button class="modal-option" data-modal-auth="customer">
-                <strong>Customer Login</strong>
-                <span>Manage online submissions, upload item photos, and track review status.</span>
+                <strong>${t("customerLoginTitle")}</strong>
+                <span>${t("customerLoginBody")}</span>
               </button>
               <button class="modal-option" data-modal-auth="broker">
-                <strong>Broker Login</strong>
-                <span>Open the broker workspace, AI review panels, and inventory controls.</span>
+                <strong>${t("brokerLoginTitle")}</strong>
+                <span>${t("brokerLoginBody")}</span>
               </button>
             </div>
             <div class="modal-helper">
               <p>${defaultFlow === "register"
-                ? "Create your account first, then choose whether you are entering as a customer or a broker."
-                : "Choose the role that matches the workflow you need to access."}</p>
+                ? t("accountCreateHelp")
+                : t("accountAccessHelp")}</p>
               <div class="modal-helper-actions">
-                <button class="gold-button" data-modal-auth="customer" type="button">${defaultFlow === "register" ? "Create Customer Account" : "Continue as Customer"}</button>
-                <button class="outline-button" data-modal-auth="demo" type="button">Continue as Demo</button>
+                <button class="gold-button" data-modal-auth="customer" type="button">${defaultFlow === "register" ? t("createCustomerAccount") : t("continueAsCustomer")}</button>
+                <button class="outline-button" data-modal-auth="demo" type="button">${t("continueAsDemo")}</button>
               </div>
             </div>
           `
@@ -1006,27 +1999,27 @@
 
       function openItemDetailsModal() {
         openModal(
-          "Describe Your Item",
+          t("describeYourItem"),
           `
             <form class="item-details-form" id="item-details-form">
               <div class="form-grid">
                 <label class="form-field">
-                  <span>Briefly Describe Your Item</span>
+                  <span>${t("brieflyDescribeYourItem")}</span>
                   <textarea name="description" rows="2" placeholder="PS5 console&#10;Gold chain&#10;Milwaukee drill&#10;Pokemon cards&#10;Dell laptop&#10;Rolex watch">${state.form.description}</textarea>
                 </label>
                 <label class="form-field">
-                  <span>Brand / Model (Optional)</span>
+                  <span>${t("brandModelOptional")}</span>
                   <input name="brand" type="text" value="${state.form.brand}" placeholder="Rolex Submariner / Sony PS5 / Milwaukee M18" />
                 </label>
                 <label class="form-field">
-                  <span>Serial Number (Optional)</span>
+                  <span>${t("serialNumberOptional")}</span>
                   <input name="serial" type="text" value="${state.form.serial}" placeholder="Serial number" />
                 </label>
               </div>
-              <p class="analysis-note">Keep it simple. One short description plus optional brand or serial helps generate a preliminary estimate before broker review.</p>
+              <p class="analysis-note">${t("keepItSimple")}</p>
               <div class="modal-helper-actions">
-                <button class="gold-button" type="submit">Save Description</button>
-                <button class="outline-button" id="clear-item-details-button" type="button">Clear Form</button>
+                <button class="gold-button" type="submit">${t("saveDescription")}</button>
+                <button class="outline-button" id="clear-item-details-button" type="button">${t("clearForm")}</button>
               </div>
             </form>
           `
@@ -1036,28 +2029,28 @@
       function openLegalModal(type) {
         const library = {
           privacy: {
-            title: "Privacy Policy",
-            body: "Customer submissions, uploaded photos, quote requests, and contact details should be processed securely and reviewed only for service, support, and operational workflow purposes."
+            title: t("privacyPolicy"),
+            body: t("privacyBody")
           },
           terms: {
-            title: "Terms",
-            body: "PawnVision OS workflows are for intake, documentation, and broker review. Final appraisal decisions, authenticity findings, and in-store offers require manual inspection and shop-specific compliance review."
+            title: t("terms"),
+            body: t("termsBody")
           },
           contact: {
-            title: "Contact",
-            body: "Need a real contact page? Use the public Contact template page to plug in store phone, email, address, and hours for each pawn shop deployment."
+            title: t("navContact"),
+            body: t("contactBody")
           },
           accessibility: {
-            title: "Accessibility",
-            body: "PawnVision OS should remain readable, keyboard accessible, and operational across desktop and mobile browsers while preserving the broker workflow layout."
+            title: t("accessibility"),
+            body: t("accessibilityBody")
           },
           social: {
-            title: "Social Links Placeholder",
-            body: "Add Facebook, Instagram, X, YouTube, or local marketplace links here when the live shop brand is ready."
+            title: t("socialLinks"),
+            body: t("socialBody")
           },
           chat: {
-            title: "Live Chat",
-            body: "Demo support panel opened. In production, this can connect to messaging, SMS, Intercom-style chat, or a broker support queue."
+            title: t("liveChat"),
+            body: t("chatBody")
           }
         };
 
@@ -1070,9 +2063,9 @@
       }
 
       function updateModeUI() {
-        uploadCardTitle.textContent = "Upload the first clear item photo";
-        uploadTrigger.textContent = "Upload Photos";
-        uploadCardSupport.textContent = "Supported: JPG, PNG";
+        uploadCardTitle.textContent = t("uploadCardTitle");
+        uploadTrigger.textContent = t("uploadPhotos");
+        uploadCardSupport.textContent = t("supportedFiles");
         fileInput.setAttribute("accept", "image/*");
         fileInput.multiple = true;
       }
@@ -1223,7 +2216,24 @@
         }
 
         const context = getCategoryContext(inferred, manual, checklistMap);
-        const { hasSerial, hasDamage, watchLike, copy } = context;
+        const { hasSerial, hasDamage, watchLike, copy, luxuryFlow, luxuryProfile } = context;
+
+        if (luxuryFlow) {
+          return {
+            resale: t("liveCompVerificationRequired"),
+            pawn: t("liveCompVerificationRequired"),
+            resaleRisk: "orange",
+            pawnRisk: "red",
+            marketText: luxuryProfile?.marketText || t("liveCompVerificationRequired"),
+            marketRisk: "orange",
+            reviewText: luxuryProfile?.reviewText || "Broker verification required before luxury pricing",
+            reviewRisk: "orange",
+            verificationText: hasSerial
+              ? `${luxuryProfile?.key || "Luxury item"} / reference provided`
+              : luxuryProfile?.verificationText || "Possible luxury item / live market verification required",
+            verificationRisk: hasSerial ? "yellow" : "orange",
+          };
+        }
 
         if (watchLike) {
           return hasSerial
@@ -1320,6 +2330,390 @@
           verificationText: hasSerial ? copy.serialProvided : copy.verificationPending,
           verificationRisk: hasSerial ? "yellow" : "orange",
         };
+      }
+
+      function getConfidenceClass(inferred, context, checklistMap, manual) {
+        const evidenceScore = getAllAssets().length + checklistMap.size + (manual.serial ? 1 : 0) + (manual.brand ? 1 : 0);
+        if (context.luxuryFlow && manual.serial) {
+          return { level: "high", label: t("confidenceHigh"), color: "green" };
+        }
+        if ((inferred.confidence || 0) >= 0.8 && evidenceScore >= 4) {
+          return { level: "high", label: t("confidenceHigh"), color: "green" };
+        }
+        if ((inferred.confidence || 0) >= 0.5) {
+          return { level: "possible", label: t("confidencePossible"), color: "yellow" };
+        }
+        return { level: "low", label: t("confidenceLow"), color: "red" };
+      }
+
+      function getBrokerQuery(analysis, manual) {
+        const parts = [
+          manual.description,
+          manual.brand,
+          manual.model,
+          manual.serial,
+          analysis.inferred.category !== "Unknown" ? analysis.inferred.category : "",
+        ].filter(Boolean);
+        return parts.join(" ").replace(/\s+/g, " ").trim();
+      }
+
+      function buildMarketResearch(analysis, manual, context) {
+        const categoryKey = analysis.inferred.category in marketSourceMap ? analysis.inferred.category : "Unknown";
+        const query = getBrokerQuery(analysis, manual);
+        const sourceEntries = marketSourceMap[categoryKey] || marketSourceMap.Unknown;
+        const sourceCards = sourceEntries.map((entry) => {
+          const meta = marketSourceMeta[entry.key] || { label: entry.key, type: entry.section };
+          return {
+            key: entry.key,
+            title: meta.label,
+            section: entry.section,
+            type: meta.type,
+            source: meta.label,
+            query,
+            url: getSearchUrl(entry.key, query),
+            listingTitle: t("noReliableComp"),
+            price: t("unavailablePrice"),
+            condition: t("unavailableCondition"),
+            seller: t("unavailableSeller"),
+            note: context.luxuryFlow ? t("verifiedCompSourcePending") : t("noReliableComp"),
+            verified: false,
+          };
+        });
+
+        return {
+          query,
+          verified: [],
+          searchCards: sourceCards,
+          sold: sourceCards.filter((card) => card.section === "sold"),
+          active: sourceCards.filter((card) => card.section === "active"),
+          retail: sourceCards.filter((card) => card.section === "retail"),
+          retailNote: isModernCategory(analysis.inferred.category)
+            ? "Retail signals should be checked against active store pricing and current depreciation."
+            : "Vintage or collectible markets may be thin or inconsistent. Sold comps are preferred when available.",
+        };
+      }
+
+      function buildBrokerReport(analysis, manual) {
+        const checklistMap = getChecklistMap();
+        const context = getCategoryContext(analysis.inferred, manual, checklistMap);
+        const confidence = getConfidenceClass(analysis.inferred, context, checklistMap, manual);
+        const marketResearch = buildMarketResearch(analysis, manual, context);
+        const now = new Date();
+        const reportId = state.currentReportId || `report-${state.reportCounter}`;
+        return {
+          id: reportId,
+          ticketNumber: state.currentReportId ? state.activeReportId || formatTicketNumber(state.reportCounter - 1) : formatTicketNumber(state.reportCounter),
+          createdAt: now.toISOString(),
+          createdLabel: getCurrentTimestamp(),
+          customerName: state.auth.loggedIn ? state.auth.name : t("guestSubmission"),
+          customerContact: state.auth.loggedIn ? t("customerAccountOnFile") : t("contactNotProvided"),
+          customerDescription: manual.description,
+          uploadedPhotos: state.images.map((item) => ({
+            src: item.url,
+            alt: item.name,
+            label: item.slot.label,
+          })),
+          category: analysis.inferred.category,
+          identifiedItem: analysis.authenticity,
+          brand: manual.brand || analysis.inferred.brand,
+          model: manual.model || analysis.inferred.model,
+          visibleCondition: analysis.condition,
+          visibleIssues: analysis.visibleIssues,
+          additionalPhotos: analysis.additionalPhotos,
+          estimatedResale: analysis.suggestedPawn,
+          suggestedPawnOffer: analysis.suggestedBuy,
+          marketResearchText: analysis.marketResearch,
+          reviewFlag: analysis.reviewFlag,
+          confidence,
+          marketResearch,
+          internalNotes: state.reports.find((report) => report.id === reportId)?.internalNotes || "",
+        };
+      }
+
+      function upsertBrokerReport(analysis, manual) {
+        if (!getAllAssets().length || !manual.description.trim()) {
+          return null;
+        }
+        const report = buildBrokerReport(analysis, manual);
+        const existingIndex = state.reports.findIndex((entry) => entry.id === report.id);
+        if (existingIndex >= 0) {
+          state.reports.splice(existingIndex, 1, { ...state.reports[existingIndex], ...report });
+        } else {
+          state.reports.unshift(report);
+          state.currentReportId = report.id;
+          state.activeReportId = report.ticketNumber;
+          state.reportCounter += 1;
+        }
+        renderBrokerInbox();
+        return report;
+      }
+
+      function getActiveBrokerReport() {
+        if (state.currentReportId) {
+          const current = state.reports.find((report) => report.id === state.currentReportId);
+          if (current) {
+            return current;
+          }
+        }
+        return state.reports[0] || null;
+      }
+
+      function renderBrokerInbox() {
+        const inbox = document.getElementById("broker-inbox-list");
+        if (!inbox) {
+          return;
+        }
+        if (!state.reports.length) {
+          inbox.innerHTML = `<div class="broker-inbox-empty">${t("noBrokerReports")}</div>`;
+          return;
+        }
+        inbox.innerHTML = state.reports
+          .slice(0, 6)
+          .map((report) => `
+            <button class="broker-inbox-item${report.id === state.currentReportId ? " is-active" : ""}" type="button" data-report-id="${report.id}">
+              <div>
+                <strong>${report.ticketNumber}</strong>
+                <span>${report.customerDescription}</span>
+              </div>
+              <small>${translateCategoryName(report.category)} • ${report.createdLabel}</small>
+            </button>
+          `)
+          .join("");
+      }
+
+      function getReportActionButtonsMarkup(report) {
+        const buttons = [
+          { action: "approve", label: t("approveEstimate") },
+          { action: "adjust", label: t("adjustOffer") },
+          { action: "photos", label: t("requestMorePhotosAction") },
+          { action: "reject", label: t("rejectItemAction") },
+          { action: "inspection", label: t("markInspection") },
+          { action: "print", label: t("printTicketReport") },
+        ];
+        return buttons
+          .map(
+            (button) => `<button class="outline-button compact-button" type="button" data-report-action="${button.action}" data-report-id="${report.id}">${button.label}</button>`
+          )
+          .join("");
+      }
+
+      function renderMarketCards(cards) {
+        if (!cards.length) {
+          return `<div class="report-empty">${t("noReliableComp")}</div>`;
+        }
+        return cards
+          .map(
+            (card) => `
+              <article class="report-market-card">
+                <div class="report-market-thumb">${card.source}</div>
+                <div class="report-market-body">
+                  <strong>${card.listingTitle}</strong>
+                  <div class="report-market-meta">
+                    <span>${t("sourceLabel")}: ${card.source}</span>
+                    <span>${card.section === "sold" ? t("soldComps") : card.section === "retail" ? t("retailSignals") : t("activeListings")}</span>
+                  </div>
+                  <div class="report-market-meta">
+                    <span>${card.price}</span>
+                    <span>${card.condition}</span>
+                  </div>
+                  <p>${card.note}</p>
+                  <div class="report-market-footer">
+                    <span>${t("searchQueryLabel")}: ${card.query}</span>
+                    <a href="${card.url}" target="_blank" rel="noopener noreferrer">${t("openSource")}</a>
+                  </div>
+                </div>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function renderBrokerReportMarkup(report) {
+        const photoMarkup = report.uploadedPhotos.length
+          ? report.uploadedPhotos
+              .map(
+                (photo) => `
+                  <figure class="report-photo-card">
+                    <img src="${photo.src}" alt="${photo.alt}" />
+                    <figcaption>${translateLabel(photo.label)}</figcaption>
+                  </figure>
+                `
+              )
+              .join("")
+          : `<div class="report-empty">${t("noBrokerReports")}</div>`;
+
+        return `
+          <div class="broker-report-sheet">
+            <div class="broker-report-topbar">
+              <div>
+                <span class="report-eyebrow">${t("reportTopSummary")}</span>
+                <h3>${report.ticketNumber}</h3>
+              </div>
+              <div class="broker-report-meta-top">
+                <span>${t("createdLabel")}: ${report.createdLabel}</span>
+                <span class="report-confidence report-confidence-${report.confidence.color}">${report.confidence.label}</span>
+              </div>
+            </div>
+
+            <div class="broker-report-grid">
+              <article class="report-section">
+                <h4>${t("customerDescriptionLabel")}</h4>
+                <div class="report-summary-grid">
+                  <div><span>${t("customerNameLabel")}</span><strong>${report.customerName}</strong></div>
+                  <div><span>${t("customerContactLabel")}</span><strong>${report.customerContact}</strong></div>
+                  <div class="report-span-full"><span>${t("originalCustomerDescription")}</span><strong>${report.customerDescription}</strong></div>
+                </div>
+              </article>
+
+              <article class="report-section">
+                <h4>${t("aiCategoryDetection")}</h4>
+                <div class="report-summary-grid">
+                  <div><span>${t("identifiedItem")}</span><strong>${translateOutput(report.identifiedItem)}</strong></div>
+                  <div><span>${t("resaleCategory")}</span><strong>${translateCategoryName(report.category)}</strong></div>
+                  <div><span>${t("aiVisibleCondition")}</span><strong>${translateOutput(report.visibleCondition)}</strong></div>
+                  <div><span>${t("estimatedResale")}</span><strong>${translateOutput(report.estimatedResale)}</strong></div>
+                  <div><span>${t("suggestedPawnOffer")}</span><strong>${translateOutput(report.suggestedPawnOffer)}</strong></div>
+                  <div><span>${t("brokerReview")}</span><strong>${translateOutput(report.reviewFlag)}</strong></div>
+                </div>
+              </article>
+            </div>
+
+            <article class="report-section">
+              <h4>${t("uploadedPhotosLabel")}</h4>
+              <div class="report-photo-grid">${photoMarkup}</div>
+            </article>
+
+            <article class="report-section">
+              <h4>${t("marketIntelligence")}</h4>
+              <div class="report-callout">
+                <strong>${t("verifiedMarketComps")}</strong>
+                <p>${t("noReliableComp")} ${t("verifiedCompSourcePending")}</p>
+              </div>
+              <div class="report-market-group">
+                <div>
+                  <span class="report-group-title">${t("soldComps")}</span>
+                  ${renderMarketCards(report.marketResearch.sold)}
+                </div>
+                <div>
+                  <span class="report-group-title">${t("activeListings")}</span>
+                  ${renderMarketCards(report.marketResearch.active)}
+                </div>
+                <div>
+                  <span class="report-group-title">${t("retailSignals")}</span>
+                  ${renderMarketCards(report.marketResearch.retail)}
+                  <p class="analysis-note">${translateOutput(report.marketResearch.retailNote)}</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="report-section">
+              <h4>${t("intakeWorkflowOutput")}</h4>
+              <div class="report-summary-grid">
+                <div class="report-span-full"><span>${t("visibleIssues")}</span><strong>${translateOutput(report.visibleIssues)}</strong></div>
+                <div class="report-span-full"><span>${t("additionalPhotos")}</span><strong>${report.additionalPhotos.length ? report.additionalPhotos.map(translateLabel).join(", ") : t("pendingFinalBrokerApproval")}</strong></div>
+                <div class="report-span-full"><span>${t("marketResearch")}</span><strong>${translateOutput(report.marketResearchText)}</strong></div>
+              </div>
+            </article>
+
+            <article class="report-section">
+              <h4>${t("brokerActionsTitle")}</h4>
+              <div class="report-action-grid">${getReportActionButtonsMarkup(report)}</div>
+              <label class="form-field report-notes-field">
+                <span>${t("internalNotes")}</span>
+                <textarea id="broker-report-notes" data-report-id="${report.id}" rows="4" placeholder="">${report.internalNotes || ""}</textarea>
+              </label>
+            </article>
+          </div>
+        `;
+      }
+
+      function openBrokerReport(reportId = "") {
+        const report = reportId ? state.reports.find((entry) => entry.id === reportId) : getActiveBrokerReport();
+        if (!report) {
+          showToast(t("reportUnavailable"));
+          return;
+        }
+        state.currentReportId = report.id;
+        renderBrokerInbox();
+        openModal(`${t("reportTopSummary")} ${report.ticketNumber}`, renderBrokerReportMarkup(report), "report");
+      }
+
+      function buildBrokerEmail(report) {
+        const body = [
+          `${t("ticketNumber")}: ${report.ticketNumber}`,
+          `${t("customerDescriptionLabel")}: ${report.customerDescription}`,
+          `${t("identifiedItem")}: ${translateOutput(report.identifiedItem)}`,
+          `${t("estimatedResale")}: ${translateOutput(report.estimatedResale)}`,
+          `${t("suggestedPawnOffer")}: ${translateOutput(report.suggestedPawnOffer)}`,
+          `${t("visibleIssues")}: ${translateOutput(report.visibleIssues)}`,
+          `${t("additionalPhotos")}: ${report.additionalPhotos.length ? report.additionalPhotos.join(", ") : t("pendingFinalBrokerApproval")}`,
+        ].join("\n");
+        return `mailto:?subject=${encodeURIComponent(`PawnVision OS ${report.ticketNumber}`)}&body=${encodeURIComponent(body)}`;
+      }
+
+      function openReportPrintView(report) {
+        const printWindow = window.open("", "_blank", "width=1200,height=900");
+        if (!printWindow) {
+          showToast(t("reportPrintReady"));
+          return;
+        }
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>${report.ticketNumber}</title>
+              <style>
+                body { font-family: Arial, sans-serif; padding: 24px; color: #111; }
+                h1, h2, h3 { margin: 0 0 12px; }
+                .grid { display: grid; gap: 16px; }
+                .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                .card { border: 1px solid #ddd; padding: 16px; margin-bottom: 16px; }
+                .photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+                .photos img { width: 100%; height: 180px; object-fit: cover; }
+                .market-card { border: 1px solid #ddd; padding: 12px; margin-bottom: 10px; }
+                small { display: block; color: #666; margin-bottom: 6px; }
+              </style>
+            </head>
+            <body>
+              <h1>${t("reportTopSummary")} ${report.ticketNumber}</h1>
+              <div class="grid two">
+                <div class="card"><h3>${t("customerDescriptionLabel")}</h3><p>${report.customerDescription}</p></div>
+                <div class="card"><h3>${t("aiCategoryDetection")}</h3><p>${translateCategoryName(report.category)}</p><p>${translateOutput(report.visibleCondition)}</p></div>
+              </div>
+              <div class="card"><h3>${t("uploadedPhotosLabel")}</h3><div class="photos">${report.uploadedPhotos.map((photo) => `<figure><img src="${photo.src}" alt="${photo.alt}" /><figcaption>${translateLabel(photo.label)}</figcaption></figure>`).join("")}</div></div>
+              <div class="card"><h3>${t("marketIntelligence")}</h3>${renderMarketCards(report.marketResearch.sold.concat(report.marketResearch.active).concat(report.marketResearch.retail))}</div>
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+      }
+
+      function handleBrokerReportAction(action, reportId) {
+        const report = state.reports.find((entry) => entry.id === reportId) || getActiveBrokerReport();
+        if (!report) {
+          showToast(t("reportUnavailable"));
+          return;
+        }
+
+        state.currentReportId = report.id;
+        renderBrokerInbox();
+
+        const messages = {
+          approve: state.language === "es" ? "Estimación aprobada para seguimiento del corredor." : "Estimate approved for broker follow-up.",
+          adjust: state.language === "es" ? "Flujo para ajustar oferta abierto." : "Offer adjustment workflow opened.",
+          photos: state.language === "es" ? "Solicitud de más fotos enviada al cliente." : "More photos requested from customer.",
+          reject: state.language === "es" ? "Artículo marcado como rechazado." : "Item marked as rejected.",
+          inspection: state.language === "es" ? "Artículo marcado para inspección en tienda." : "Item marked for in-store inspection.",
+        };
+
+        if (action === "print") {
+          openReportPrintView(report);
+          showToast(t("reportPrintReady"));
+          return;
+        }
+
+        showToast(messages[action] || t("brokerReportUpdated"));
       }
 
       function applyRiskClass(element, risk) {
@@ -1474,8 +2868,8 @@
             <div class="checklist-item">
               <span class="checklist-dot">+</span>
               <div>
-                <strong>Upload first photo</strong>
-                <small>Start with one clear full-item image. Guided requests will appear after broad category recognition.</small>
+                <strong>${t("uploadFirstPhotoLabel")}</strong>
+                <small>${t("uploadFirstPhotoHelp")}</small>
               </div>
             </div>
           `;
@@ -1491,8 +2885,8 @@
               <div class="checklist-item${complete ? " is-complete" : ""}">
                 <span class="checklist-dot">${complete ? "✓" : "!"}</span>
                 <div>
-                  <strong>${request.label}</strong>
-                  <small>${complete ? "Provided" : "Additional photo requested"}</small>
+                  <strong>${translateLabel(request.label)}</strong>
+                  <small>${complete ? t("provided") : t("additionalPhotoRequested")}</small>
                 </div>
               </div>
             `;
@@ -1514,47 +2908,49 @@
           .map(
             (check) => `
               <li class="quality-item ${check.passed ? "is-pass" : "is-warn"}">
-                <span>${check.label}</span>
-                <strong>${check.passed ? "Ready" : "Needs review"}</strong>
+                <span>${translateOutput(check.label)}</span>
+                <strong>${check.passed ? t("ready") : t("needsReview")}</strong>
               </li>
             `
           )
           .join("");
 
         document.getElementById("submission-status").textContent = !allAssets.length
-          ? "Awaiting upload"
+          ? t("awaitingUpload")
           : inferred.category === "Description required"
-            ? "Description required"
+            ? translateCategoryName("Description required")
             : inferred.category === "Unknown"
-              ? "Additional photos requested"
+              ? translateOutput("Additional photos requested")
           : evidenceStatus.thresholdMet
-            ? "Ready for broker review"
-            : "Additional photos requested";
+            ? translateOutput("Ready for broker review")
+            : translateOutput("Additional photos requested");
 
-        qualityMessage.textContent = !allAssets.length
-          ? "Upload a clear first photo to begin the guided broker intake process."
-          : inferred.category === "Description required"
-            ? "Add one short item description before category detection begins."
-          : inferred.category === "Unknown"
-            ? "Unable to confidently identify the item category yet. Add clearer images and a short description."
-          : failedRequired.length
-            ? "Possible match recorded. Preliminary estimate available now. Additional photos requested for a stronger review."
-            : evidenceStatus.thresholdMet
-              ? "Minimum evidence received. Preliminary estimate is active and broker review can move forward."
-              : "Initial quality checks passed. Preliminary estimate is active. Add requested angles to improve confidence.";
+        qualityMessage.textContent = translateOutput(
+          !allAssets.length
+            ? "Upload a clear first photo to begin the guided broker intake process."
+            : inferred.category === "Description required"
+              ? "Add one short item description before category detection begins."
+            : inferred.category === "Unknown"
+              ? "Unable to confidently identify the item category yet. Add clearer images and a short description."
+            : failedRequired.length
+              ? "Possible match recorded. Preliminary estimate available now. Additional photos requested for a stronger review."
+              : evidenceStatus.thresholdMet
+                ? "Minimum evidence received. Preliminary estimate is active and broker review can move forward."
+                : "Initial quality checks passed. Preliminary estimate is active. Add requested angles to improve confidence."
+        );
 
         uploadCount.textContent = !allAssets.length
-          ? "No photos uploaded yet"
+          ? t("noPhotosUploaded")
           : inferred.category === "Description required"
-            ? "Short description required"
-          : `Possible match: ${inferred.category}`;
+            ? translateCategoryName("Description required")
+          : translateOutput(`Possible match: ${inferred.category}`);
         uploadHint.textContent = !allAssets.length
-          ? "Upload one clear photo to start guided evidence collection."
+          ? t("uploadHint")
           : inferred.category === "Description required"
-            ? "Add a short description like “Pokemon cards” or “Dell laptop” before category detection."
+            ? translateOutput("Add a short description like “Pokemon cards” or “Dell laptop” before category detection.")
           : guidedRequests.length
-            ? `Additional photos requested: ${guidedRequests.join(", ")}.`
-            : "Pending final broker approval.";
+            ? translateOutput(`Additional photos requested: ${guidedRequests.map((request) => request.label).join(", ")}.`)
+            : t("pendingFinalBrokerApproval");
       }
 
       function getActiveImageAnalysis() {
@@ -1698,12 +3094,13 @@
           applyRiskClass(document.getElementById("summary-market"), "");
           applyRiskClass(document.getElementById("summary-review"), "");
         applyRiskClass(document.getElementById("summary-pawn-range"), "");
-        applyRiskClass(document.getElementById("summary-buy-range"), "");
-        applyRiskClass(document.getElementById("auth-confidence"), "");
-        applyRiskClass(document.getElementById("broker-review-flag"), "");
-        syncReadoutVisuals(false);
-        return;
-      }
+          applyRiskClass(document.getElementById("summary-buy-range"), "");
+          applyRiskClass(document.getElementById("auth-confidence"), "");
+          applyRiskClass(document.getElementById("broker-review-flag"), "");
+          syncReadoutVisuals(false);
+          renderBrokerInbox();
+          return;
+        }
 
         const brandValue = manual.brand || analysis.inferred.brand;
         const modelValue = manual.model || analysis.inferred.model;
@@ -1776,6 +3173,7 @@
         applyRiskClass(document.getElementById("auth-confidence"), analysis.pricing.verificationRisk);
         applyRiskClass(document.getElementById("broker-review-flag"), analysis.pricing.reviewRisk);
         syncReadoutVisuals(true);
+        upsertBrokerReport(analysis, manual);
       }
 
       function revokeAssets(items) {
@@ -1818,9 +3216,14 @@
           model: "",
           serial: "",
         };
+        state.reports = [];
+        state.currentReportId = "";
+        state.activeReportId = "";
+        state.reportCounter = 978;
         syncVisibleDescriptionField();
         updateItemDetailsStep();
         updateQualityReview();
+        renderBrokerInbox();
         updateBrokerPanels();
         showToast("Demo reset to blank dashboard state.");
       }
@@ -2035,7 +3438,7 @@
           `;
           document.querySelectorAll("[data-placeholder='upload']").forEach((button) => {
             button.addEventListener("click", () => {
-              fileInput.click();
+              triggerFilePicker();
               showToast("Upload a file to begin the guided intake workflow.");
             });
           });
@@ -2150,14 +3553,14 @@
           return;
         }
         state.pendingReplace = false;
-        fileInput.click();
+        triggerFilePicker();
       });
 
       dropZone.addEventListener("keydown", (event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
           state.pendingReplace = false;
-          fileInput.click();
+          triggerFilePicker();
         }
       });
 
@@ -2165,7 +3568,7 @@
         event.preventDefault();
         event.stopPropagation();
         state.pendingReplace = false;
-        fileInput.click();
+        triggerFilePicker();
       });
 
       document.querySelectorAll(".tab").forEach((button) => {
@@ -2255,7 +3658,7 @@
           return;
         }
         state.pendingReplace = true;
-        fileInput.click();
+        triggerFilePicker();
       });
       clearAllButton.addEventListener("click", clearAllUploads);
       resetDemoButton.addEventListener("click", resetDemoState);
@@ -2287,6 +3690,14 @@
         const authTarget = event.target.closest("[data-modal-auth]");
         if (authTarget) {
           setAuth(authTarget.dataset.modalAuth, modalTitle.textContent.includes("Create") ? "Account creation" : "Login");
+        }
+        const reportActionTarget = event.target.closest("[data-report-action]");
+        if (reportActionTarget) {
+          handleBrokerReportAction(
+            reportActionTarget.dataset.reportAction,
+            reportActionTarget.dataset.reportId || state.currentReportId
+          );
+          return;
         }
         if (event.target.id === "clear-item-details-button") {
           state.form = {
@@ -2326,6 +3737,14 @@
       });
 
       appModal.addEventListener("input", (event) => {
+        const notesField = event.target.closest("#broker-report-notes");
+        if (notesField) {
+          const report = state.reports.find((entry) => entry.id === notesField.dataset.reportId);
+          if (report) {
+            report.internalNotes = notesField.value;
+          }
+          return;
+        }
         const form = event.target.closest("#item-details-form");
         if (!form) {
           return;
@@ -2365,6 +3784,52 @@
         });
       });
 
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          setLanguage(button.dataset.lang);
+        });
+      });
+
+      if (brokerInboxList) {
+        brokerInboxList.addEventListener("click", (event) => {
+          const reportButton = event.target.closest("[data-report-id]");
+          if (!reportButton) {
+            return;
+          }
+          openBrokerReport(reportButton.dataset.reportId);
+        });
+      }
+
+      if (openReportButton) {
+        openReportButton.addEventListener("click", () => {
+          openBrokerReport();
+        });
+      }
+
+      if (emailReportButton) {
+        emailReportButton.addEventListener("click", () => {
+          const report = getActiveBrokerReport();
+          if (!report) {
+            showToast(t("reportUnavailable"));
+            return;
+          }
+          window.location.href = buildBrokerEmail(report);
+          showToast(t("reportEmailReady"));
+        });
+      }
+
+      if (printReportButton) {
+        printReportButton.addEventListener("click", () => {
+          const report = getActiveBrokerReport();
+          if (!report) {
+            showToast(t("reportUnavailable"));
+            return;
+          }
+          openReportPrintView(report);
+          showToast(t("reportPrintReady"));
+        });
+      }
+
       document.querySelectorAll("[data-broker-action]").forEach((button) => {
         button.addEventListener("click", () => {
           button.classList.toggle("is-active");
@@ -2395,11 +3860,14 @@
         updateBrokerPanels();
       });
 
+      applyTranslations();
       updateAuthUI();
       updateModeUI();
       syncVisibleDescriptionField();
       updateItemDetailsStep();
       renderUploads();
+      renderBrokerInbox();
+      updateBrokerPanels();
       updateMetalsPricing();
       window.setInterval(updateMetalsPricing, 60000);
     </script>
