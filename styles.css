@@ -591,8 +591,15 @@ main {
   font-size: 0.96rem;
 }
 
+.public-footer-email {
+  margin-top: 14px;
+  color: #d8dde6;
+  font-size: 0.96rem;
+}
+
 .contact-direct-line a,
-.request-demo-email a {
+.request-demo-email a,
+.public-footer-email a {
   color: var(--gold-bright);
   text-decoration: underline;
 }

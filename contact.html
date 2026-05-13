@@ -73,7 +73,7 @@
           <article class="section-panel contact-form-panel">
             <p class="section-kicker">Demo Request</p>
             <h2>REQUEST ENTERPRISE DEMO</h2>
-            <form class="contact-form" action="#" method="get">
+            <form class="contact-form" id="request-demo-form" action="#" method="get">
               <label>
                 <span>Name</span>
                 <input type="text" name="name" placeholder="Your name" />
@@ -136,5 +136,42 @@
         </footer>
       </main>
     </div>
+    <script>
+      (() => {
+        const form = document.getElementById("request-demo-form");
+        if (!form) return;
+
+        form.addEventListener("submit", (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(form);
+          const name = String(formData.get("name") || "").trim();
+          const businessName = String(formData.get("business-name") || "").trim();
+          const email = String(formData.get("email") || "").trim();
+          const phone = String(formData.get("phone") || "").trim();
+          const locations = String(formData.get("locations") || "").trim();
+          const message = String(formData.get("message") || "").trim();
+
+          const subject = businessName
+            ? `PawnVision OS Demo Request - ${businessName}`
+            : "PawnVision OS Demo Request";
+
+          const bodyLines = [
+            "PawnVision OS demo request",
+            "",
+            `Name: ${name || "Not provided"}`,
+            `Business name: ${businessName || "Not provided"}`,
+            `Email: ${email || "Not provided"}`,
+            `Phone: ${phone || "Not provided"}`,
+            `Number of locations: ${locations || "Not provided"}`,
+            "",
+            "Message:",
+            message || "Not provided",
+          ];
+
+          window.location.href = `mailto:Brad@pawnvision-os.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyLines.join("\n"))}`;
+        });
+      })();
+    </script>
   </body>
 </html>
